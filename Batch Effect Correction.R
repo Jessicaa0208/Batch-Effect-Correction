@@ -30,15 +30,15 @@ sum(Raw_Data==0)
 
 
 ## Zählen, wie viele verschiedene Metaproteine in den einzelnen Samples gefunden wurden
-Count_Data <- data.frame(Sample = rep(NA, 960), Metaproteins_Found = rep(NA, 960))
+Count_Data <- data.frame(Sample = rep(NA, 960), Metaproteins_unique = rep(NA, 960))
 
 for(i in 11:970){
   Count_Data[i - 10, 1] <- colnames(Raw_Data)[i]
   Count_Data[i - 10, 2] <- sum(Raw_Data[,i] != 0) ## != 0 bedeutet, es wurde mindestens einmal ein bestimmtes Metaprotein gefunden, sum zählt alle wo das TRUE ist
 }
 
-min(Count_Data$Metaproteins_Found)
-max(Count_Data$Metaproteins_Found)
+min(Count_Data$Metaproteins_unique)
+max(Count_Data$Metaproteins_unique)
 
 
 
@@ -75,7 +75,7 @@ sum(rows_true >= 480) ## Wie viele Metaproteine wurden in über der Hälfte der 
 
 
 ## Subset vom Rohdatensatz mit den Daten, die zum Sup_File passen
-## also behalte nur die Spalten, die auch im Sup_File vorkommen
+## also behalte nur die Spalten (Samples), die auch im Sup_File vorkommen
 ## in der gleichen Reihenfolge wie in Sup_File
 
 Sup_File$ID %in% Count_Data$Sample ## Sind die Sample IDs im Rohdatensatz enthalten?
@@ -87,12 +87,30 @@ Subset_Data <- cbind(Raw_Data[, 1:10], Raw_Data[, Sup_File$ID[Sup_File$ID %in% n
 
 
 ## Zählen, wie viele verschiedene Metaproteine in den einzelnen Samples gefunden wurden
-Count_Data_Subset <- data.frame(Sample = rep(NA, 427), Metaproteins_Found = rep(NA, 427))
+Count_Data_Subset <- data.frame(Sample = rep(NA, 427), Metaproteins_unique = rep(NA, 427))
 
 for(i in 11:437){
   Count_Data_Subset[i - 10, 1] <- colnames(Subset_Data)[i]
-  Count_Data_Subset[i - 10, 2] <- sum(Raw_Data[,i] != 0) ## != 0 bedeutet, es wurde mindestens einmal ein bestimmtes Metaprotein gefunden, sum zählt alle wo das TRUE ist
+  Count_Data_Subset[i - 10, 2] <- sum(Subset_Data[,i] != 0) ## != 0 bedeutet, es wurde mindestens einmal ein bestimmtes Metaprotein gefunden, sum zählt alle wo das TRUE ist
 }
+
+
+## absolute Anzahl an gefundenen Metaproteinen pro Sample
+Count_Data_Subset$Metaproteins_total <- as.numeric(colSums(Subset_Data[,11:437]))
+
+## Zu Count_Data_Subset study, study2, disease, batch und condition (aus Sup_File) hinzufügen
+
+Sup_File <- Sup_File[Sup_File$ID %in% Count_Data$Sample, ] ## Die IDs entfernen, die nicht vorkommen
+
+Count_Data_Subset$study <- Sup_File$study
+Count_Data_Subset$study2 <- Sup_File$study2
+Count_Data_Subset$disease <- Sup_File$disease
+Count_Data_Subset$condition <- Sup_File$condition
+Count_Data_Subset$batch <- Sup_File$batch
+
+
+
+
 
 
 
@@ -120,15 +138,9 @@ sum(rows_true_subset >= 214) ## Wie viele Metaproteine wurden in über der Hälf
 
 
 
-## Zu Count_Data_Subset study, study2, disease, batch und condition (aus Sup_File) hinzufügen
 
-Sup_File <- Sup_File[Sup_File$ID %in% Count_Data$Sample, ] ## Die IDs entfernen, die nicht vorkommen
 
-Count_Data_Subset$study <- Sup_File$study
-Count_Data_Subset$study2 <- Sup_File$study2
-Count_Data_Subset$disease <- Sup_File$disease
-Count_Data_Subset$condition <- Sup_File$condition
-Count_Data_Subset$batch <- Sup_File$batch
+
 
 
 
