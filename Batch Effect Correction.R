@@ -86,7 +86,7 @@ Subset_Data <- cbind(Raw_Data[, 1:10], Raw_Data[, Sup_File$ID[Sup_File$ID %in% n
 
 
 
-## Zählen, wie viele verschiedene Metaproteine in den einzelnen Samples gefunden wurden
+# Zählen, wie viele verschiedene Metaproteine in den einzelnen Samples gefunden wurden
 Count_Data_Subset <- data.frame(Sample = rep(NA, 427), Metaproteins_unique = rep(NA, 427))
 
 for(i in 11:437){
@@ -109,13 +109,65 @@ Count_Data_Subset$condition <- Sup_File$condition
 Count_Data_Subset$batch <- Sup_File$batch
 
 
+#ANOVA
+summary(aov(Metaproteins_unique ~ condition + study, data = Count_Data_Subset))
+summary(aov(Metaproteins_total ~ condition + study, data = Count_Data_Subset))
 
 
 
 
 
 
-## Welche Metaproteine wurden in den Stichproben gefunden
+
+# Array
+
+## 45432 Zeilen (Metaproteine), 7 Spalten,  427 Samples
+Subset_Array <- array(NA, dim = c(45432, 7, 427))
+dimnames(Subset_Array) <- list(NULL, c("Metaprotein.Number", "Metaproteins_Found", "study", "study2",
+                                      "disease", "condition", "batch"), Sample = Count_Data_Subset$Sample)
+
+Subset_Array[,1,] <- Subset_Data$Metaprotein.Number ## Überall die Metaproteinnummern einfügen
+
+## Schleife über alle Samples
+for(n in 1:427){
+  Subset_Array[,2,n] <- Subset_Data[,n+10] ## In jedem Sample in der 2. Spalte die Anzahl einfügen, wie oft das jeweilige Metaprotein gefunden wurde
+  Subset_Array[,3,n] <- rep(Count_Data_Subset[n,4], 45432) ## study
+  Subset_Array[,4,n] <- rep(Count_Data_Subset[n,5], 45432) ## study2
+  Subset_Array[,5,n] <- rep(Count_Data_Subset[n,6], 45432) ## disease
+  Subset_Array[,6,n] <- rep(Count_Data_Subset[n,7], 45432) ## condition
+  Subset_Array[,7,n] <- rep(Count_Data_Subset[n,8], 45432) ## batch
+}
+
+## Test: Subset_Array[,,"EXP.ABC.01.mgf"], Subset_Array[,,"EXP.P02_C.mgf"]
+
+
+
+
+# Das Gleiche als Liste statt als Array
+
+Subset_List <- vector("list", length = 427)
+names(Subset_List) <- Count_Data_Subset$Sample ## Samples
+
+## Schleife über alle Samples
+for(n in seq_len(427)) {
+  Subset_List[[n]] <- data.frame(
+    Metaprotein.Number   <- Subset_Data$Metaprotein.Number,
+    Metaproteins_Found   <- Subset_Data[, n + 10],
+    study                <- rep(Count_Data_Subset[n, 4], 45432),
+    study2               <- rep(Count_Data_Subset[n, 5], 45432),
+    disease              <- rep(Count_Data_Subset[n, 6], 45432),
+    condition            <- rep(Count_Data_Subset[n, 7], 45432),
+    batch                <- rep(Count_Data_Subset[n, 8], 45432)
+  )
+}
+
+
+
+
+
+
+
+# Welche Metaproteine wurden in den Stichproben gefunden
 Metaproteins_Found_Subset <- data.frame(Metaprotein_Number = Subset_Data[,1])
 
 for(j in 1:427){
