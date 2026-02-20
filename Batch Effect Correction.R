@@ -166,6 +166,67 @@ for(n in seq_len(427)) {
 
 
 
+# Gefundene Metaproteine pro Sample in eine Liste
+Metaproteins_Found_List <- vector("list", length = 427)
+names(Metaproteins_Found_List) <- Count_Data_Subset$Sample ## Samples
+for(m in 1:427){
+  Metaproteins_Found_List[[m]] <- Subset_List[[m]][which(Subset_List[[m]][,2] != 0), 1]
+}
+
+
+
+
+
+
+
+
+
+# Gefundene Metaproteine nach Studien aufteilen
+table(sapply(Subset_List, function(x) x[,3]))
+Study_List <- vector("list", length = 9)
+names(Study_List) <- names(table(sapply(Subset_List, function(x) x[,3])))
+
+studies <-  names(table(sapply(Subset_List, function(x) x[,3])))
+
+Study_List <- lapply(studies, function(study_name) {
+  samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
+  
+  protein_lists <- lapply(samples_in_study, function(x) x$Metaprotein.Number[x$Metaproteins_Found != 0])
+  
+  all_proteins <- unique(unlist(protein_lists))
+  
+  return(all_proteins)
+})
+
+Study_List
+
+common_proteins <- Reduce(intersect, Study_List)
+length(common_proteins) ## 709 Metaproteine überschneiden sich in allen Studien
+
+# Discovery Studien
+Study_List_Discovery <- list(Study_List$Henry, Study_List$`Thuy-Boun`, Study_List$Lehmann, Study_List$`Lloyd-Price`)
+names(Study_List_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-price")
+common_proteins_discovery <- Reduce(intersect, Study_List_Discovery)
+length(common_proteins_discovery) ## 1838 Metaproteine überschneiden sich in allen Discovery Studien
+
+
+
+
+# Venn Diagramme
+#install.packages("VennDiagram")
+library(VennDiagram)
+venn.diagram(Study_List_Discovery, category.names = names(Study_List_Discovery),
+             filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
+             fill = c("cadetblue","olivedrab3", "khaki1", "indianred"))
+
+
+
+
+
+
+
+
+
 
 # Welche Metaproteine wurden in den Stichproben gefunden
 Metaproteins_Found_Subset <- data.frame(Metaprotein_Number = Subset_Data[,1])
