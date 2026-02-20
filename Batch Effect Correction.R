@@ -198,6 +198,8 @@ Study_List <- lapply(studies, function(study_name) {
   return(all_proteins)
 })
 
+names(Study_List) <- studies
+
 Study_List
 
 common_proteins <- Reduce(intersect, Study_List)
@@ -225,29 +227,70 @@ venn.diagram(Study_List_Discovery, category.names = names(Study_List_Discovery),
 
 
 
+# Häufigkeit der gefundenen Metaproteine vergleichen
+Study_Counts <- lapply(studies, function(study_name) {
+  samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
+  
+  df_study <- do.call(rbind, lapply(samples_in_study, function(x) c(x$Metaprotein.Number, x$Metaproteins_Found)))
+  
+  counts_per_protein <- aggregate(Metaproteins_Found ~ Metaprotein.Number, data = df_study, FUN = sum)
+  
+  return(counts_per_protein)
+})
+
+names(Study_Counts) <- studies
+
+Study_Counts <- lapply(studies, function(study_name) {
+  # Alle Samples dieser Studie auswählen
+  samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
+  
+  # Alle relevanten Zeilen aus diesen Samples zusammenführen
+  df_study <- do.call(rbind,
+                      lapply(samples_in_study,
+                             function(x) data.frame(Metaprotein.Number = x$Metaprotein.Number,
+                                                    Metaproteins_Found = x$Metaproteins_Found)))
+  
+  # Nur Proteine behalten, die überhaupt gefunden wurden (>0)
+  df_study <- df_study[df_study$Metaproteins_Found > 0, ]
+  
+  # Gesamtanzahl pro Protein berechnen
+  counts_per_protein <- aggregate(Metaproteins_Found ~ Metaprotein.Number,
+                                  data = df_study,
+                                  FUN = sum)
+  
+  # Ergebnis als benannten Vektor oder Data Frame zurückgeben
+  return(counts_per_protein)
+})
+
+names(Study_Counts) <- studies
+
+Study_Counts_Discovery <- list(Study_Counts$Henry, Study_Counts$`Thuy-Boun`, Study_Counts$Lehmann, Study_Counts$`Lloyd-Price`)
+names(Study_Counts_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-price")
+venn.diagram(lapply(Study_Counts_Discovery, function(x) x[,1]), category.names = names(Study_Counts_Discovery),
+             filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
+             fill = c("cadetblue","olivedrab3", "khaki1", "indianred"))
+## Venndiagramm stimmt mit Study_List_Discovery überein
 
 
 
-# Welche Metaproteine wurden in den Stichproben gefunden
-Metaproteins_Found_Subset <- data.frame(Metaprotein_Number = Subset_Data[,1])
-
-for(j in 1:427){
-  Metaproteins_Found_Subset[,j+1] <- Metaproteins_Found_Subset$Metaprotein_Number %in% Subset_Data[which(Subset_Data[,j + 10] != 0), 1]
-  ## Überprüft, welche Metaproteine gefunden wurden (Welche Metaproteine ungleich 0 sind) und codiert mit TRUE/FALSE
-}
-
-colnames(Metaproteins_Found_Subset)[2:428] <- colnames(Subset_Data[11:437])
+## Wie oft wurden in den Studien einzelne Metaproteine gefunden (wenn sie gefunden wurden, also ohne 0)
+par(mfrow = c(2,2))
+boxplot(Study_Counts$`Lloyd-Price`[which(Study_Counts$`Lloyd-Price`[,2] != 0), 2], main = "Lloyd-Price")
+boxplot(Study_Counts$Lehmann[which(Study_Counts$Lehmann[,2] != 0), 2], main = "Lehmann")
+boxplot(Study_Counts$`Thuy-Boun`[which(Study_Counts$`Thuy-Boun`[,2] != 0), 2], main = "Thuy-Boun")
+boxplot(Study_Counts$Henry[which(Study_Counts$Henry[,2] != 0), 2], main = "Henry")
+par(mfrow = c(1,1))
 
 
-rows_all_true_subset <- apply(Metaproteins_Found_Subset[,-1], 1, function(x) all(x == TRUE))
-any(rows_all_true_subset)
-sum(rows_all_true_subset)
 
-rows_true_subset <- rowSums(Metaproteins_Found_Subset[,-1]) ## In wie vielen Studien wurden die einzelnen Metaproteine gefunden
-max(rows_true_subset)
-min(rows_true_subset)
-hist(rows_true_subset)
-sum(rows_true_subset >= 214) ## Wie viele Metaproteine wurden in über der Hälfte der Studien gefunden
+
+
+
+
+
+
+
+
 
 
 
