@@ -367,23 +367,23 @@ g1 + g2
 # Silhouette Score
 library(cluster)
 
-coords_before <- pca_before$x
+batch_labels <- as.factor(batch)
 
-batch_labels <- factor(c(rep("Lehmann", 62), rep("Henry", 18), rep("Thuy-Boun", 18), rep("Lloyd-Price", 48)))
+## before
+coords_before <- pca_before$x
 
 dist_matrix_before <- dist(coords_before)
 
 sil_before <- silhouette(as.numeric(batch_labels), dist_matrix_before)
 
-
+## after
 coords_after <- pca_after$x
-
-batch_labels <- factor(c(rep("Lehmann", 62), rep("Henry", 18), rep("Thuy-Boun", 18), rep("Lloyd-Price", 48)))
 
 dist_matrix_after <- dist(coords_after)
 
 sil_after <- silhouette(as.numeric(batch_labels), dist_matrix_after)
 
+## Vergleich Silhouetten Score before und after
 mean(sil_before[, "sil_width"])
 mean(sil_after[, "sil_width"])
 
