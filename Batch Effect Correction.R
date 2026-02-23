@@ -286,96 +286,16 @@ par(mfrow = c(1,1))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Paket MultiBaC ------------------------------------
-
-BiocManager::install("MultiBaC")
-browseVignettes("MultiBaC")
-library("MultiBaC")
-
-data("multiyeast")
-## createMbac: generiert eine Listenobjekt, welches für weitere Mbac Funktionen benötigt wird
-my_mbac <- createMbac(inputOmics = list(A.rna, A.gro, B.rna, B.ribo, C.rna, C.par),
-                       batchFactor = c("A", "A", "B", "B", "C", "C"),
-                       experimentalDesign = list("A" = c("Glu+", "Glu+",
-                                                         "Glu+", "Glu-", "Glu-", "Glu-"),
-                                                 "B" = c("Glu+", "Glu+", "Glu-", "Glu-"),
-                                                 "C" = c("Glu+", "Glu+", "Glu-", "Glu-")),
-                       omicNames = c("RNA", "GRO", "RNA", "RIBO", "RNA", "PAR"))
-
-## batchEstPlot: This function uses linear models to estimate the batch effect magnitude using the common data
-## across batches. It compares the result with theoretical distribution of diferrent levels of batch magnitude
-batchEstPlot(my_mbac) 
-
-
-
-## genModelList: This function performs PLS models for every batch. A PLS model is generated for each noncommon omic in each batch
-my_mbac_2 <- genModelList(my_mbac, test.comp = NULL,
-                           scale = FALSE, center = TRUE,
-                           crossval = NULL,
-                           showinfo = TRUE)
-
-## genMissingOmics: This function generates for all the batches the omic data they had not originally. This is the previous
-## step to apply ARSyNbac [1] correction
-multiBatchDesign <- genMissingOmics(my_mbac_2)
-
-## batchCorrection: Batch Correction mit ARSyNbac correction
-my_finalwise_mbac <- batchCorrection(my_mbac_2,
-                                     multiBatchDesign = multiBatchDesign,
-                                     Interaction = FALSE,
-                                     Variability = 0.9)
-
-
-## MultiBaC: Batch Correction mit MultiBaC correction
-my_final_mbac <- MultiBaC(my_mbac,
-                           test.comp = NULL, scale = FALSE,
-                           center = TRUE, crossval = NULL,
-                           Variability = 0.90,
-                           Interaction = TRUE ,
-                           showplot = FALSE,
-                           showinfo = FALSE)
-
-
-plot(my_final_mbac) ## Enthält explained_varPlot und Q2_plot (MultiBaC)
-plot(my_finalwise_mbac) ## Enthält explained_varPlot und Q2_plot (ARSyNbac)
-
-plot_pca(my_mbac, typeP = "pca.org") ## pca plot for original data
-plot_pca(my_final_mbac, typeP = "pca.cor") ## pca plot for corrected data (MultiBaC)
-plot_pca(my_finalwise_mbac, typeP = "pca.cor") ## pca plot for corrected data (ARSyNbac)
-
-inner_relPlot (my_final_mbac)
-par(mfrow=c(1,1))
-
-summary(my_mbac)
-
-
-
-
-
 # Paket sva (ComBat, Leek et al. 2012) ---------------------------------------------------------------
 
 BiocManager::install("sva")
 
-
-
-
+library(sva)
 library(dplyr)
 library(purrr)
 library(tidyr)
 library(ggplot2)
+library(patchwork)
 
 Subset_List_Discovery <- Filter(function(x) { ## Filter: behält nur die Elemente der Liste, wo TRUE ist
   any(unique(x[,3]) %in% studies_discovery)
@@ -387,12 +307,12 @@ Subset_List_Discovery <- Filter(function(x) { ## Filter: behält nur die Element
 # Werte = Häufigkeiten
 # Vektor batch = Studienzuordnung pro Sample
 
-sample_names <- names(Subset_List) ## Namen der Samples aus der Liste
-study_names <- sapply(Subset_List, function(x) unique(x[,3])) ## vektor der angibt zu welcher Studie jedes Sample gehört
+sample_names <- names(Subset_List_Discovery) ## Namen der Samples aus der Liste
+study_names <- sapply(Subset_List_Discovery, function(x) unique(x[,3])) ## vektor der angibt zu welcher Studie jedes Sample gehört
 table(study_names)
 
-Subset_List <- imap(Subset_List, ~ mutate(.x, Sample = .y)) ## Allen Dataframes in Liste die Spalte Sample hinzufügen
-df_long <- bind_rows(Subset_List) ## Kombiniere alle Samples in einen langen Dataframe
+Subset_List_Discovery <- imap(Subset_List_Discovery, ~ mutate(.x, Sample = .y)) ## Allen Dataframes in der Liste die Spalte Sample hinzufügen
+df_long <- bind_rows(Subset_List_Discovery) ## Kombiniere alle Samples in einen langen Dataframe
 names(df_long) <- c("Metaprotein.Number", "Metaproteins_Found", "study", "study2", "disease", "condition", "batch", "Sample")
 
 ## In breites Format umwandeln
@@ -419,13 +339,57 @@ combat_data <- ComBat(as.matrix(matrix_df), batch = batch, mod = NULL, par.prior
 pca_before <- prcomp(t(matrix_df))
 pca_after  <- prcomp(t(combat_data))
 
+par(mfrow = c(1,1))
 df_before <- data.frame(pca_before$x[,1:2], batch=batch)
-ggplot(df_before, aes(PC1, PC2, color=batch)) +
+g1 <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Vor ComBat")
 
 df_after <- data.frame(pca_after$x[,1:2], batch=batch)
-ggplot(df_after, aes(PC1, PC2, color=batch)) +
+g2 <- ggplot(df_after, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Nach ComBat")
+
+g1 + g2
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Quantifizierung der Batch Effect Correction -----------------------------
+
+# Silhouette Score
+library(cluster)
+
+coords_before <- pca_before$x
+
+batch_labels <- factor(c(rep("Lehmann", 62), rep("Henry", 18), rep("Thuy-Boun", 18), rep("Lloyd-Price", 48)))
+
+dist_matrix_before <- dist(coords_before)
+
+sil_before <- silhouette(as.numeric(batch_labels), dist_matrix_before)
+
+
+coords_after <- pca_after$x
+
+batch_labels <- factor(c(rep("Lehmann", 62), rep("Henry", 18), rep("Thuy-Boun", 18), rep("Lloyd-Price", 48)))
+
+dist_matrix_after <- dist(coords_after)
+
+sil_after <- silhouette(as.numeric(batch_labels), dist_matrix_after)
+
+mean(sil_before[, "sil_width"])
+mean(sil_after[, "sil_width"])
+
+
+
+
 
 
 
@@ -441,22 +405,68 @@ BiocManager::install("limma")
 
 
 
-# Quantifizierung der Batch Effect Correction -----------------------------
-
-## Silhouette Score
-library("cluster")
-
-## Für kmeans müssen Zeilen die batches sein
-Example_Data <- t(cbind(A.gro, A.rna, B.ribo, B.rna, C.par, C.rna))
-C_example <- kmeans(Example_Data, 6)
-S_example <- silhouette(C_example$cluster, dist(Example_Data))
-mean(S_example[, "sil_width"])
 
 
-## Anzahl der gefundenen Metaproteine Clustern
-C_example2 <- kmeans(Count_Data[,2], 4)
-S_example2 <- silhouette(C_example2$cluster, dist(Count_Data[,2]))
-mean(S_example2[, "sil_width"])
 
 
-## PCA mit formula: MetaProteins = \mu + Studie + Krankheit
+
+# Paket MultiBaC ------------------------------------
+
+BiocManager::install("MultiBaC")
+browseVignettes("MultiBaC")
+library("MultiBaC")
+
+data("multiyeast")
+## createMbac: generiert eine Listenobjekt, welches für weitere Mbac Funktionen benötigt wird
+my_mbac <- createMbac(inputOmics = list(A.rna, A.gro, B.rna, B.ribo, C.rna, C.par),
+                      batchFactor = c("A", "A", "B", "B", "C", "C"),
+                      experimentalDesign = list("A" = c("Glu+", "Glu+",
+                                                        "Glu+", "Glu-", "Glu-", "Glu-"),
+                                                "B" = c("Glu+", "Glu+", "Glu-", "Glu-"),
+                                                "C" = c("Glu+", "Glu+", "Glu-", "Glu-")),
+                      omicNames = c("RNA", "GRO", "RNA", "RIBO", "RNA", "PAR"))
+
+## batchEstPlot: This function uses linear models to estimate the batch effect magnitude using the common data
+## across batches. It compares the result with theoretical distribution of diferrent levels of batch magnitude
+batchEstPlot(my_mbac) 
+
+
+
+## genModelList: This function performs PLS models for every batch. A PLS model is generated for each noncommon omic in each batch
+my_mbac_2 <- genModelList(my_mbac, test.comp = NULL,
+                          scale = FALSE, center = TRUE,
+                          crossval = NULL,
+                          showinfo = TRUE)
+
+## genMissingOmics: This function generates for all the batches the omic data they had not originally. This is the previous
+## step to apply ARSyNbac [1] correction
+multiBatchDesign <- genMissingOmics(my_mbac_2)
+
+## batchCorrection: Batch Correction mit ARSyNbac correction
+my_finalwise_mbac <- batchCorrection(my_mbac_2,
+                                     multiBatchDesign = multiBatchDesign,
+                                     Interaction = FALSE,
+                                     Variability = 0.9)
+
+
+## MultiBaC: Batch Correction mit MultiBaC correction
+my_final_mbac <- MultiBaC(my_mbac,
+                          test.comp = NULL, scale = FALSE,
+                          center = TRUE, crossval = NULL,
+                          Variability = 0.90,
+                          Interaction = TRUE ,
+                          showplot = FALSE,
+                          showinfo = FALSE)
+
+
+plot(my_final_mbac) ## Enthält explained_varPlot und Q2_plot (MultiBaC)
+plot(my_finalwise_mbac) ## Enthält explained_varPlot und Q2_plot (ARSyNbac)
+
+plot_pca(my_mbac, typeP = "pca.org") ## pca plot for original data
+plot_pca(my_final_mbac, typeP = "pca.cor") ## pca plot for corrected data (MultiBaC)
+plot_pca(my_finalwise_mbac, typeP = "pca.cor") ## pca plot for corrected data (ARSyNbac)
+
+inner_relPlot (my_final_mbac)
+par(mfrow=c(1,1))
+
+summary(my_mbac)
