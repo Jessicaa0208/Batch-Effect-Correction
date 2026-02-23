@@ -189,10 +189,13 @@ names(Study_List) <- names(table(sapply(Subset_List, function(x) x[,3])))
 studies <-  names(table(sapply(Subset_List, function(x) x[,3])))
 
 Study_List <- lapply(studies, function(study_name) {
+  ## Alle Samples nach Studien aufteilen (es reicht erstes Element der 3. Spalte, da in einem Sample immer der gleiche Studienname steht)
   samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
   
+  ## Gefundene Metaproteine aus diesen Samples (nur die behalten, die >0 sind)
   protein_lists <- lapply(samples_in_study, function(x) x$Metaprotein.Number[x$Metaproteins_Found != 0])
   
+  ## Vereinigung der gefundenen Metaproteine über alle Samples der Studie
   all_proteins <- unique(unlist(protein_lists))
   
   return(all_proteins)
@@ -202,12 +205,13 @@ names(Study_List) <- studies
 
 Study_List
 
-common_proteins <- Reduce(intersect, Study_List)
+common_proteins <- Reduce(intersect, Study_List) ## interset gibt Vektor von überschneidungen aus, Reduce wendet es auf die ganze Liste an
 length(common_proteins) ## 709 Metaproteine überschneiden sich in allen Studien
 
 # Discovery Studien
 Study_List_Discovery <- list(Study_List$Henry, Study_List$`Thuy-Boun`, Study_List$Lehmann, Study_List$`Lloyd-Price`)
-names(Study_List_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-price")
+names(Study_List_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-Price")
+studies_discovery <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-Price")
 common_proteins_discovery <- Reduce(intersect, Study_List_Discovery)
 length(common_proteins_discovery) ## 1838 Metaproteine überschneiden sich in allen Discovery Studien
 
@@ -228,44 +232,32 @@ venn.diagram(Study_List_Discovery, category.names = names(Study_List_Discovery),
 
 
 # Häufigkeit der gefundenen Metaproteine vergleichen
-Study_Counts <- lapply(studies, function(study_name) {
-  samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
-  
-  df_study <- do.call(rbind, lapply(samples_in_study, function(x) c(x$Metaprotein.Number, x$Metaproteins_Found)))
-  
-  counts_per_protein <- aggregate(Metaproteins_Found ~ Metaprotein.Number, data = df_study, FUN = sum)
-  
-  return(counts_per_protein)
-})
-
-names(Study_Counts) <- studies
 
 Study_Counts <- lapply(studies, function(study_name) {
-  # Alle Samples dieser Studie auswählen
+  ## Alle Samples nach Studien aufteilen
   samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
   
-  # Alle relevanten Zeilen aus diesen Samples zusammenführen
+  ## Alle relevanten Zeilen aus diesen Samples zusammenführen
   df_study <- do.call(rbind,
                       lapply(samples_in_study,
                              function(x) data.frame(Metaprotein.Number = x$Metaprotein.Number,
                                                     Metaproteins_Found = x$Metaproteins_Found)))
   
-  # Nur Proteine behalten, die überhaupt gefunden wurden (>0)
+  ## Nur Proteine behalten, die überhaupt gefunden wurden (>0)
   df_study <- df_study[df_study$Metaproteins_Found > 0, ]
   
-  # Gesamtanzahl pro Protein berechnen
+  ## Gesamtanzahl pro Protein berechnen
   counts_per_protein <- aggregate(Metaproteins_Found ~ Metaprotein.Number,
                                   data = df_study,
                                   FUN = sum)
   
-  # Ergebnis als benannten Vektor oder Data Frame zurückgeben
   return(counts_per_protein)
 })
 
 names(Study_Counts) <- studies
 
 Study_Counts_Discovery <- list(Study_Counts$Henry, Study_Counts$`Thuy-Boun`, Study_Counts$Lehmann, Study_Counts$`Lloyd-Price`)
-names(Study_Counts_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-price")
+names(Study_Counts_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-Price")
 venn.diagram(lapply(Study_Counts_Discovery, function(x) x[,1]), category.names = names(Study_Counts_Discovery),
              filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
              fill = c("cadetblue","olivedrab3", "khaki1", "indianred"))
@@ -273,12 +265,12 @@ venn.diagram(lapply(Study_Counts_Discovery, function(x) x[,1]), category.names =
 
 
 
-## Wie oft wurden in den Studien einzelne Metaproteine gefunden (wenn sie gefunden wurden, also ohne 0)
+## Wie oft wurden in den Studien einzelne Metaproteine gefunden 
 par(mfrow = c(2,2))
-boxplot(Study_Counts$`Lloyd-Price`[which(Study_Counts$`Lloyd-Price`[,2] != 0), 2], main = "Lloyd-Price")
-boxplot(Study_Counts$Lehmann[which(Study_Counts$Lehmann[,2] != 0), 2], main = "Lehmann")
-boxplot(Study_Counts$`Thuy-Boun`[which(Study_Counts$`Thuy-Boun`[,2] != 0), 2], main = "Thuy-Boun")
-boxplot(Study_Counts$Henry[which(Study_Counts$Henry[,2] != 0), 2], main = "Henry")
+boxplot(Study_Counts$`Lloyd-Price`[, 2], main = "Lloyd-Price")
+boxplot(Study_Counts$Lehmann[, 2], main = "Lehmann")
+boxplot(Study_Counts$`Thuy-Boun`[, 2], main = "Thuy-Boun")
+boxplot(Study_Counts$Henry[, 2], main = "Henry")
 par(mfrow = c(1,1))
 
 
@@ -376,43 +368,64 @@ summary(my_mbac)
 # Paket sva (ComBat, Leek et al. 2012) ---------------------------------------------------------------
 
 BiocManager::install("sva")
-BiocManager::install("bladderbatch")
-
-library(sva)
-library(bladderbatch)
-data(bladderdata)
-dat <- bladderEset[1:50,]
-pheno = pData(dat)
-edata = exprs(dat)
-batch = pheno$batch
-mod = model.matrix(~as.factor(cancer), data=pheno)
-# parametric adjustment
-combat_edata1 = ComBat(dat=edata, batch=batch, mod=NULL, par.prior=TRUE, prior.plots=FALSE)
-# non-parametric adjustment, mean-only version
-combat_edata2 = ComBat(dat=edata, batch=batch, mod=NULL, par.prior=FALSE, mean.only=TRUE)
-# reference-batch version, with covariates
-combat_edata3 = ComBat(dat=edata, batch=batch, mod=mod, par.prior=TRUE, ref.batch=3)
-
-n.sv = num.sv(edata,mod,method="leek")
-## empirical.controls: A function for estimating the probability that each gene is an empirical
-## control
-pcontrol <- empirical.controls(edata,mod,mod0=NULL,n.sv=n.sv,type="norm")
 
 
-mod0 = model.matrix(~1,data=pheno)
-## f.pvalue: A function for quickly calculating f statistic p-values for use in sva
-pValues = f.pvalue(edata,mod,mod0)
-qValues = p.adjust(pValues,method="BH")
-
-## fstats: A function for quickly calculating f statistics for use in sva
-fs <- fstats(edata, mod, mod0)
-
-svobj = sva(edata,mod,mod0,n.sv=n.sv)
-
-## sva.check : A function for post-hoc checking of an sva object to check for degenerate cases.
-svacheckobj = sva.check(svobj,edata,mod,mod0)
 
 
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(ggplot2)
+
+Subset_List_Discovery <- Filter(function(x) { ## Filter: behält nur die Elemente der Liste, wo TRUE ist
+  any(unique(x[,3]) %in% studies_discovery)
+}, Subset_List)
+
+# Zielstruktur für Combat:
+# Zeilen = Metaproteine
+# Spalten = Samples
+# Werte = Häufigkeiten
+# Vektor batch = Studienzuordnung pro Sample
+
+sample_names <- names(Subset_List) ## Namen der Samples aus der Liste
+study_names <- sapply(Subset_List, function(x) unique(x[,3])) ## vektor der angibt zu welcher Studie jedes Sample gehört
+table(study_names)
+
+Subset_List <- imap(Subset_List, ~ mutate(.x, Sample = .y)) ## Allen Dataframes in Liste die Spalte Sample hinzufügen
+df_long <- bind_rows(Subset_List) ## Kombiniere alle Samples in einen langen Dataframe
+names(df_long) <- c("Metaprotein.Number", "Metaproteins_Found", "study", "study2", "disease", "condition", "batch", "Sample")
+
+## In breites Format umwandeln
+matrix_df <- df_long |> 
+  select("Metaprotein.Number", "Sample", "Metaproteins_Found") |> 
+  pivot_wider(names_from = "Sample",
+              values_from = "Metaproteins_Found",
+              values_fill = list(Metaproteins_Found = NA)) |>
+  as.data.frame()
+
+## Metaprotein.Number als Zeilen des Dataframes umwandeln
+rownames(matrix_df) <- matrix_df$Metaprotein.Number
+matrix_df <- matrix_df[, -1]
+
+## batch Vektor
+batch <- study_names[match(colnames(matrix_df), names(study_names))]
+table(batch) ## Wie viele Samples gibt es pro Studie
+
+
+combat_data <- ComBat(as.matrix(matrix_df), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
+
+
+# PCA zur Kontrolle der Batch Korrektur
+pca_before <- prcomp(t(matrix_df))
+pca_after  <- prcomp(t(combat_data))
+
+df_before <- data.frame(pca_before$x[,1:2], batch=batch)
+ggplot(df_before, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor ComBat")
+
+df_after <- data.frame(pca_after$x[,1:2], batch=batch)
+ggplot(df_after, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach ComBat")
 
 
 
