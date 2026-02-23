@@ -274,6 +274,16 @@ boxplot(Study_Counts$Henry[, 2], main = "Henry")
 par(mfrow = c(1,1))
 
 
+# Auf Ausreißer testen
+install.packages("outliers")
+library(outliers)
+
+grubbs.test(Study_Counts$`Lloyd-Price`[,2], type = 10)
+grubbs.test(Study_Counts$Lehmann[,2], type = 10)
+grubbs.test(Study_Counts$`Thuy-Boun`[,2], type = 10)
+grubbs.test(Study_Counts$Henry[,2], type = 10)
+
+
 
 
 
@@ -297,7 +307,7 @@ library(tidyr)
 library(ggplot2)
 library(patchwork)
 
-Subset_List_Discovery <- Filter(function(x) { ## Filter: behält nur die Elemente der Liste, wo TRUE ist
+Subset_List_Discovery <- Filter(function(x) { ## Filter(): behält nur die Elemente der Liste, wo TRUE ist
   any(unique(x[,3]) %in% studies_discovery)
 }, Subset_List)
 
@@ -337,20 +347,59 @@ combat_data <- ComBat(as.matrix(matrix_df), batch = batch, mod = NULL, par.prior
 
 # PCA zur Kontrolle der Batch Korrektur
 pca_before <- prcomp(t(matrix_df))
-pca_after  <- prcomp(t(combat_data))
+pca_after_combat  <- prcomp(t(combat_data))
 
-par(mfrow = c(1,1))
 df_before <- data.frame(pca_before$x[,1:2], batch=batch)
-g1 <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
+g1_combat <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Vor ComBat")
 
-df_after <- data.frame(pca_after$x[,1:2], batch=batch)
-g2 <- ggplot(df_after, aes(PC1, PC2, color=batch)) +
+df_after_combat <- data.frame(pca_after_combat$x[,1:2], batch=batch)
+g2_combat <- ggplot(df_after_combat, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Nach ComBat")
 
-g1 + g2
+g1_combat + g2_combat
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Paket limma (Ritchie et al. 2015) -------------------------------------------------------------
+
+BiocManager::install("limma")
+library(limma)
+
+limma_data <- removeBatchEffect(as.matrix(matrix_df), batch = batch)
+
+# PCA zur Kontrolle der Batch Korrektur
+pca_before <- prcomp(t(matrix_df))
+pca_after_limma  <- prcomp(t(limma_data))
+
+df_before <- data.frame(pca_before$x[,1:2], batch=batch)
+g1_limma <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor limma")
+
+df_after_limma <- data.frame(pca_after_limma$x[,1:2], batch=batch)
+g2_limma <- ggplot(df_after_limma, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach limma")
+
+g1_limma + g2_limma
 
 
 
@@ -376,16 +425,28 @@ dist_matrix_before <- dist(coords_before)
 
 sil_before <- silhouette(as.numeric(batch_labels), dist_matrix_before)
 
-## after
-coords_after <- pca_after$x
+## after combat
+coords_after_combat <- pca_after_combat$x
 
-dist_matrix_after <- dist(coords_after)
+dist_matrix_after_combat <- dist(coords_after_combat)
 
-sil_after <- silhouette(as.numeric(batch_labels), dist_matrix_after)
+sil_after_combat <- silhouette(as.numeric(batch_labels), dist_matrix_after_combat)
 
 ## Vergleich Silhouetten Score before und after
 mean(sil_before[, "sil_width"])
-mean(sil_after[, "sil_width"])
+mean(sil_after_combat[, "sil_width"])
+
+
+## after limma
+coords_after_limma <- pca_after_limma$x
+
+dist_matrix_after_limma <- dist(coords_after_limma)
+
+sil_after_limma <- silhouette(as.numeric(batch_labels), dist_matrix_after_limma)
+
+
+mean(sil_before[, "sil_width"])
+mean(sil_after_limma[, "sil_width"])
 
 
 
@@ -396,9 +457,6 @@ mean(sil_after[, "sil_width"])
 
 
 
-# Paket limma (Ritchie et al. 2015) -------------------------------------------------------------
-
-BiocManager::install("limma")
 
 
 
@@ -408,13 +466,17 @@ BiocManager::install("limma")
 
 
 
-
-
-# Paket MultiBaC ------------------------------------
+# Paket MultiBaC (Ugidos et al. 2022) ------------------------------------
 
 BiocManager::install("MultiBaC")
 browseVignettes("MultiBaC")
 library("MultiBaC")
+
+mbac_data <- createMbac(inputOmics = as.matrix(matrix_df), batchFactor = batch_labels,
+                        experimentalDesign = NULL, omicNames = Metaprotein.Number)
+
+
+
 
 data("multiyeast")
 ## createMbac: generiert eine Listenobjekt, welches für weitere Mbac Funktionen benötigt wird
