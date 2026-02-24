@@ -203,7 +203,7 @@ Study_List <- lapply(studies, function(study_name) {
 
 names(Study_List) <- studies
 
-Study_List
+
 
 common_proteins <- Reduce(intersect, Study_List) ## interset gibt Vektor von überschneidungen aus, Reduce wendet es auf die ganze Liste an
 length(common_proteins) ## 709 Metaproteine überschneiden sich in allen Studien
@@ -451,6 +451,14 @@ mean(sil_after_limma[, "sil_width"])
 
 
 
+# kBET
+library(devtools)
+install_github('theislab/kBET')
+library(kBET)
+
+k_bet <- kBET(as.matrix(matrix_df), batch = batch, plot = TRUE)
+k_bet$summary
+k_bet$results
 
 
 
@@ -532,3 +540,16 @@ inner_relPlot (my_final_mbac)
 par(mfrow=c(1,1))
 
 summary(my_mbac)
+
+
+
+
+
+
+# Paket batchtma ----------------------------------------------------------
+
+remotes::install_github("stopsack/batchtma")
+library(batchtma)
+
+adjust_batch(data = matrix_df, markers = as.matrix(matrix_df), batch = batch, method = simple)
+
