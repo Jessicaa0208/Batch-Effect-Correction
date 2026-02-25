@@ -2,7 +2,6 @@ setwd("C:\\Users\\jessi\\Documents\\Uni\\3. Mastersemester Statistik\\Praktikum"
 library(openxlsx)
 Raw_Data <- read.delim("ProphaneInputGroupsWithPepQuant.csv")
 Sup_File <- read.xlsx("metadata_table.xlsx")
-#SupFile <- read.csv("SupplementaryFile1.csv", sep = ";")
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
@@ -119,31 +118,11 @@ summary(aov(Metaproteins_total ~ condition + study, data = Count_Data_Subset))
 
 
 
-# Array
-
-## 45432 Zeilen (Metaproteine), 7 Spalten,  427 Samples
-Subset_Array <- array(NA, dim = c(45432, 7, 427))
-dimnames(Subset_Array) <- list(NULL, c("Metaprotein.Number", "Metaproteins_Found", "study", "study2",
-                                      "disease", "condition", "batch"), Sample = Count_Data_Subset$Sample)
-
-Subset_Array[,1,] <- Subset_Data$Metaprotein.Number ## Überall die Metaproteinnummern einfügen
-
-## Schleife über alle Samples
-for(n in 1:427){
-  Subset_Array[,2,n] <- Subset_Data[,n+10] ## In jedem Sample in der 2. Spalte die Anzahl einfügen, wie oft das jeweilige Metaprotein gefunden wurde
-  Subset_Array[,3,n] <- rep(Count_Data_Subset[n,4], 45432) ## study
-  Subset_Array[,4,n] <- rep(Count_Data_Subset[n,5], 45432) ## study2
-  Subset_Array[,5,n] <- rep(Count_Data_Subset[n,6], 45432) ## disease
-  Subset_Array[,6,n] <- rep(Count_Data_Subset[n,7], 45432) ## condition
-  Subset_Array[,7,n] <- rep(Count_Data_Subset[n,8], 45432) ## batch
-}
-
-## Test: Subset_Array[,,"EXP.ABC.01.mgf"], Subset_Array[,,"EXP.P02_C.mgf"]
 
 
 
 
-# Das Gleiche als Liste statt als Array
+# Liste mit Samples als Listeneinträge, Spalten sind jeweils die Informationen über die Metaproteine und Studienmerkmale
 
 Subset_List <- vector("list", length = 427)
 names(Subset_List) <- Count_Data_Subset$Sample ## Samples
@@ -321,6 +300,7 @@ sample_names <- names(Subset_List_Discovery) ## Namen der Samples aus der Liste
 study_names <- sapply(Subset_List_Discovery, function(x) unique(x[,3])) ## vektor der angibt zu welcher Studie jedes Sample gehört
 table(study_names)
 
+
 Subset_List_Discovery <- imap(Subset_List_Discovery, ~ mutate(.x, Sample = .y)) ## Allen Dataframes in der Liste die Spalte Sample hinzufügen
 df_long <- bind_rows(Subset_List_Discovery) ## Kombiniere alle Samples in einen langen Dataframe
 names(df_long) <- c("Metaprotein.Number", "Metaproteins_Found", "study", "study2", "disease", "condition", "batch", "Sample")
@@ -345,6 +325,8 @@ table(batch) ## Wie viele Samples gibt es pro Studie
 combat_data <- ComBat(as.matrix(matrix_df), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
 
 
+
+
 # PCA zur Kontrolle der Batch Korrektur
 pca_before <- prcomp(t(matrix_df))
 pca_after_combat  <- prcomp(t(combat_data))
@@ -362,7 +344,46 @@ g1_combat + g2_combat
 
 
 
+# Condition betrachten
+study_condition <- sapply(Subset_List_Discovery, function(x) unique(x[, 6])) ## Vektor der angibt, ob das Sample control oder diseased ist
 
+batch_condition <- study_condition[match(colnames(matrix_df), names(study_condition))]
+
+
+pca_before <- prcomp(t(matrix_df))
+pca_after_combat  <- prcomp(t(combat_data))
+
+df_condition_before <- data.frame(pca_before$x[,1:2], condition=batch_condition)
+g1_condition_combat <- ggplot(df_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Vor ComBat")
+
+df_condition_after_combat <- data.frame(pca_after_combat$x[,1:2], condition=batch_condition)
+g2_condition_combat <- ggplot(df_after_combat, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach ComBat")
+
+g1_condition_combat + g2_condition_combat
+
+
+
+
+# Disease betrachten
+study_disease <- sapply(Subset_List_Discovery, function(x) unique(x[, 5]))
+
+batch_disease <- study_disease[match(colnames(matrix_df), names(study_disease))]
+
+
+pca_before <- prcomp(t(matrix_df))
+pca_after_combat  <- prcomp(t(combat_data))
+
+df_disease_before <- data.frame(pca_before$x[,1:2], condition=batch_disease)
+g1_disease_combat <- ggplot(df_before, aes(PC1, PC2, color=batch_disease)) +
+  geom_point() + ggtitle("Vor ComBat")
+
+df_disease_after_combat <- data.frame(pca_after_combat$x[,1:2], condition=batch_disease)
+g2_disease_combat <- ggplot(df_after_combat, aes(PC1, PC2, color=batch_disease)) +
+  geom_point() + ggtitle("Nach ComBat")
+
+g1_disease_combat + g2_disease_combat
 
 
 
@@ -400,6 +421,22 @@ g2_limma <- ggplot(df_after_limma, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Nach limma")
 
 g1_limma + g2_limma
+
+
+
+# Condition betrachten
+pca_before <- prcomp(t(matrix_df))
+pca_after_limma  <- prcomp(t(limma_data))
+
+df_condition_before <- data.frame(pca_before$x[,1:2], condition=batch_condition)
+g1_condition_limma <- ggplot(df_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Vor limma")
+
+df_condition_after_limma <- data.frame(pca_after_limma$x[,1:2], condition=batch_condition)
+g2_condition_limma <- ggplot(df_after_limma, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach limma")
+
+g1_condition_limma + g2_condition_limma
 
 
 
@@ -451,6 +488,55 @@ mean(sil_after_limma[, "sil_width"])
 
 
 
+
+
+
+
+
+
+# Condition betrachten 
+batch_labels_condition <- as.factor(batch_condition)
+
+## before
+coords_before <- pca_before$x
+
+dist_matrix_before <- dist(coords_before)
+
+sil_condition_before <- silhouette(as.numeric(batch_labels_condition), dist_matrix_before)
+
+## after combat
+coords_after_combat <- pca_after_combat$x
+
+dist_matrix_after_combat <- dist(coords_after_combat)
+
+sil_condition_after_combat <- silhouette(as.numeric(batch_labels_condition), dist_matrix_after_combat)
+
+## Vergleich Silhouetten Score before und after
+mean(sil_condition_before[, "sil_width"])
+mean(sil_condition_after_combat[, "sil_width"])
+
+
+## after limma
+coords_after_limma <- pca_after_limma$x
+
+dist_matrix_after_limma <- dist(coords_after_limma)
+
+sil_condition_after_limma <- silhouette(as.numeric(batch_labels_condition), dist_matrix_after_limma)
+
+
+mean(sil_condition_before[, "sil_width"])
+mean(sil_condition_after_limma[, "sil_width"])
+
+
+
+
+
+
+
+
+
+
+
 # kBET
 library(devtools)
 install_github('theislab/kBET')
@@ -459,6 +545,13 @@ library(kBET)
 k_bet <- kBET(as.matrix(matrix_df), batch = batch, plot = TRUE)
 k_bet$summary
 k_bet$results
+
+k_bet_combat <- kBET(combat_data, batch = batch, plot = TRUE)
+k_bet_combat$summary
+
+k_bet_limma <- kBET(limma_data, batch = batch, plot = TRUE)
+k_bet_limma$summary
+
 
 
 
