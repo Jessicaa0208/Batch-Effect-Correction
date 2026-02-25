@@ -448,6 +448,62 @@ g1_condition_limma + g2_condition_limma
 
 
 
+
+
+
+
+
+
+
+
+
+# Paket harmony (Korsunsky et al. 2019) -----------------------------------------------------------
+
+install.packages("harmony")
+library(harmony)
+
+
+## Dateiformat für harmony: Samples als Zeilen, Metaproteine als Spalten -> matrix_df transponieren
+
+harmony_data <- RunHarmony(data_mat = as.matrix(t(matrix_df)), meta_data = batch, vars_use = "batch")
+
+install.packages("umap")
+library(umap)
+
+umap_res <- umap(harmony_data)
+plot(umap_res$layout, col = batch_labels)
+
+
+
+
+pca_before <- prcomp(t(matrix_df))
+pca_after_harmony  <- prcomp(harmony_data) ## prcomp erwartet Samples als Zeilen, was hier schon der Fall ist
+
+df_before <- data.frame(pca_before$x[,1:2], condition=batch)
+g1_harmony <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor harmony")
+
+df_after_harmony <- data.frame(pca_after_harmony$x[,1:2], condition=batch)
+g2_harmony <- ggplot(df_after_harmony, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach harmony")
+
+g1_harmony + g2_harmony
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Quantifizierung der Batch Effect Correction -----------------------------
 
 # Silhouette Score
@@ -485,6 +541,17 @@ sil_after_limma <- silhouette(as.numeric(batch_labels), dist_matrix_after_limma)
 mean(sil_before[, "sil_width"])
 mean(sil_after_limma[, "sil_width"])
 
+
+
+## after harmony
+coords_after_harmony <- pca_after_harmony$x
+
+dist_matrix_after_harmony <- dist(coords_after_harmony)
+
+sil_after_harmony <- silhouette(as.numeric(batch_labels), dist_matrix_after_harmony)
+
+mean(sil_before[, "sil_width"])
+mean(sil_after_harmony[, "sil_width"])
 
 
 
@@ -551,6 +618,19 @@ k_bet_combat$summary
 
 k_bet_limma <- kBET(limma_data, batch = batch, plot = TRUE)
 k_bet_limma$summary
+
+k_bet_harmony <- kBET(harmony_data, batch = batch, plot = FALSE)
+k_bet_harmony$summary
+
+
+
+
+
+
+
+
+
+
 
 
 
