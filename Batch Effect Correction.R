@@ -446,13 +446,6 @@ library(harmony)
 
 harmony_data <- RunHarmony(data_mat = as.matrix(t(matrix_df)), meta_data = batch, vars_use = "batch")
 
-install.packages("umap")
-library(umap)
-
-umap_res <- umap(harmony_data)
-plot(umap_res$layout, col = batch_labels)
-
-
 
 
 pca_before <- prcomp(t(matrix_df))
@@ -504,9 +497,7 @@ dist_matrix_after_combat <- dist(coords_after_combat)
 
 sil_after_combat <- silhouette(as.numeric(batch_labels), dist_matrix_after_combat)
 
-## Vergleich Silhouetten Score before und after
-mean(sil_before[, "sil_width"])
-mean(sil_after_combat[, "sil_width"])
+
 
 
 ## after limma
@@ -517,9 +508,6 @@ dist_matrix_after_limma <- dist(coords_after_limma)
 sil_after_limma <- silhouette(as.numeric(batch_labels), dist_matrix_after_limma)
 
 
-mean(sil_before[, "sil_width"])
-mean(sil_after_limma[, "sil_width"])
-
 
 
 ## after harmony
@@ -529,7 +517,11 @@ dist_matrix_after_harmony <- dist(coords_after_harmony)
 
 sil_after_harmony <- silhouette(as.numeric(batch_labels), dist_matrix_after_harmony)
 
+
+## Vergleich average Silhouetten Score before und after
 mean(sil_before[, "sil_width"])
+mean(sil_after_combat[, "sil_width"])
+mean(sil_after_limma[, "sil_width"])
 mean(sil_after_harmony[, "sil_width"])
 
 
@@ -587,15 +579,15 @@ mean(sil_condition_after_limma[, "sil_width"])
 library(devtools)
 install_github('theislab/kBET')
 library(kBET)
+set.seed(2)
 
-k_bet <- kBET(as.matrix(matrix_df), batch = batch, plot = TRUE)
+k_bet <- kBET(as.matrix(matrix_df), batch = batch, plot = FALSE)
 k_bet$summary
-k_bet$results
 
-k_bet_combat <- kBET(combat_data, batch = batch, plot = TRUE)
+k_bet_combat <- kBET(combat_data, batch = batch, plot = FALSE)
 k_bet_combat$summary
 
-k_bet_limma <- kBET(limma_data, batch = batch, plot = TRUE)
+k_bet_limma <- kBET(limma_data, batch = batch, plot = FALSE)
 k_bet_limma$summary
 
 k_bet_harmony <- kBET(harmony_data, batch = batch, plot = FALSE)
