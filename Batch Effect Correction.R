@@ -303,6 +303,11 @@ table(batch) ## Wie viele Samples gibt es pro Studie
 combat_data <- ComBat(as.matrix(matrix_df), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
 
 
+# Normalisierter dataframe
+csum <- as.numeric(colSums(matrix_df))
+matrix_df_norm <- matrix_df / rep(csum, each = nrow(matrix_df))
+combat_data_norm <- ComBat(as.matrix(matrix_df_norm), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
+
 
 
 # PCA zur Kontrolle der Batch Korrektur
@@ -318,6 +323,22 @@ g2_combat <- ggplot(df_after_combat, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Nach ComBat")
 
 g1_combat + g2_combat
+
+
+
+## Normalisierte Daten
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_combat_norm  <- prcomp(t(combat_data_norm))
+
+df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
+g1_combat_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor ComBat (normalisiert)")
+
+df_after_combat_norm <- data.frame(pca_after_combat_norm$x[,1:2], batch=batch)
+g2_combat_norm <- ggplot(df_after_combat_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach ComBat (normalisiert)")
+
+g1_combat_norm + g2_combat_norm
 
 
 
@@ -402,6 +423,26 @@ g1_limma + g2_limma
 
 
 
+# Normalisierte Daten
+limma_data_norm <- removeBatchEffect(as.matrix(matrix_df_norm), batch = batch)
+
+
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_limma_norm  <- prcomp(t(limma_data_norm))
+
+df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
+g1_limma_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor limma (normalisiert)")
+
+df_after_limma_norm <- data.frame(pca_after_limma_norm$x[,1:2], batch=batch)
+g2_limma_norm <- ggplot(df_after_limma_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach limma (normalisiert)")
+
+g1_limma_norm + g2_limma_norm
+
+
+
+
 # Condition betrachten
 pca_before <- prcomp(t(matrix_df))
 pca_after_limma  <- prcomp(t(limma_data))
@@ -463,6 +504,26 @@ g1_harmony + g2_harmony
 
 
 
+# Normalisierte Daten
+harmony_data_norm <- RunHarmony(data_mat = as.matrix(t(matrix_df_norm)), meta_data = batch, vars_use = "batch")
+
+
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_harmony_norm  <- prcomp(harmony_data_norm) ## prcomp erwartet Samples als Zeilen, was hier schon der Fall ist
+
+df_before_norm <- data.frame(pca_before_norm$x[,1:2], condition=batch)
+g1_harmony_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor harmony (normalisiert)")
+
+df_after_harmony_norm <- data.frame(pca_after_harmony_norm$x[,1:2], condition=batch)
+g2_harmony_norm <- ggplot(df_after_harmony_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach harmony (normalisiert)")
+
+g1_harmony_norm + g2_harmony_norm
+
+
+
+
 
 
 
@@ -489,6 +550,7 @@ dist_matrix_before <- dist(coords_before)
 
 sil_before <- silhouette(as.numeric(batch_labels), dist_matrix_before)
 
+
 ## after combat
 coords_after_combat <- pca_after_combat$x
 
@@ -498,14 +560,12 @@ sil_after_combat <- silhouette(as.numeric(batch_labels), dist_matrix_after_comba
 
 
 
-
 ## after limma
 coords_after_limma <- pca_after_limma$x
 
 dist_matrix_after_limma <- dist(coords_after_limma)
 
 sil_after_limma <- silhouette(as.numeric(batch_labels), dist_matrix_after_limma)
-
 
 
 
@@ -523,6 +583,50 @@ mean(sil_after_combat[, "sil_width"])
 mean(sil_after_limma[, "sil_width"])
 mean(sil_after_harmony[, "sil_width"])
 
+
+
+
+# Normalisierte Daten
+
+## before
+coords_before_norm <- pca_before_norm$x
+
+dist_matrix_before_norm <- dist(coords_before_norm)
+
+sil_before_norm <- silhouette(as.numeric(batch_labels), dist_matrix_before_norm)
+
+
+## after combat
+coords_after_combat_norm <- pca_after_combat_norm$x
+
+dist_matrix_after_combat_norm <- dist(coords_after_combat_norm)
+
+sil_after_combat_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_combat_norm)
+
+
+
+## after limma
+coords_after_limma_norm <- pca_after_limma_norm$x
+
+dist_matrix_after_limma_norm <- dist(coords_after_limma_norm)
+
+sil_after_limma_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_limma_norm)
+
+
+
+## after harmony
+coords_after_harmony_norm <- pca_after_harmony_norm$x
+
+dist_matrix_after_harmony_norm <- dist(coords_after_harmony_norm)
+
+sil_after_harmony_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_harmony_norm)
+
+
+## Vergleich average Silhouetten Score before und after
+mean(sil_before_norm[, "sil_width"])
+mean(sil_after_combat_norm[, "sil_width"])
+mean(sil_after_limma_norm[, "sil_width"])
+mean(sil_after_harmony_norm[, "sil_width"])
 
 
 
