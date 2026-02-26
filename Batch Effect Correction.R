@@ -108,9 +108,7 @@ Count_Data_Subset$condition <- Sup_File$condition
 Count_Data_Subset$batch <- Sup_File$batch
 
 
-#ANOVA
-summary(aov(Metaproteins_unique ~ condition + study, data = Count_Data_Subset))
-summary(aov(Metaproteins_total ~ condition + study, data = Count_Data_Subset))
+
 
 
 
@@ -142,67 +140,14 @@ for(n in seq_len(427)) {
 
 
 
-
-
-
-# Gefundene Metaproteine pro Sample in eine Liste
-Metaproteins_Found_List <- vector("list", length = 427)
-names(Metaproteins_Found_List) <- Count_Data_Subset$Sample ## Samples
-for(m in 1:427){
-  Metaproteins_Found_List[[m]] <- Subset_List[[m]][which(Subset_List[[m]][,2] != 0), 1]
-}
-
-
-
-
-
-
-
-
-
-# Gefundene Metaproteine nach Studien aufteilen
-table(sapply(Subset_List, function(x) x[,3]))
-Study_List <- vector("list", length = 9)
-names(Study_List) <- names(table(sapply(Subset_List, function(x) x[,3])))
-
-studies <-  names(table(sapply(Subset_List, function(x) x[,3])))
-
-Study_List <- lapply(studies, function(study_name) {
-  ## Alle Samples nach Studien aufteilen (es reicht erstes Element der 3. Spalte, da in einem Sample immer der gleiche Studienname steht)
-  samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
-  
-  ## Gefundene Metaproteine aus diesen Samples (nur die behalten, die >0 sind)
-  protein_lists <- lapply(samples_in_study, function(x) x$Metaprotein.Number[x$Metaproteins_Found != 0])
-  
-  ## Vereinigung der gefundenen Metaproteine über alle Samples der Studie
-  all_proteins <- unique(unlist(protein_lists))
-  
-  return(all_proteins)
-})
-
-names(Study_List) <- studies
-
-
-
-common_proteins <- Reduce(intersect, Study_List) ## interset gibt Vektor von überschneidungen aus, Reduce wendet es auf die ganze Liste an
-length(common_proteins) ## 709 Metaproteine überschneiden sich in allen Studien
-
-# Discovery Studien
-Study_List_Discovery <- list(Study_List$Henry, Study_List$`Thuy-Boun`, Study_List$Lehmann, Study_List$`Lloyd-Price`)
-names(Study_List_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-Price")
+# Discovery Kohorte
 studies_discovery <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-Price")
-common_proteins_discovery <- Reduce(intersect, Study_List_Discovery)
-length(common_proteins_discovery) ## 1838 Metaproteine überschneiden sich in allen Discovery Studien
+Subset_List_Discovery <- Filter(function(x) { ## Filter(): behält nur die Elemente der Liste, wo TRUE ist
+  any(unique(x[,3]) %in% studies_discovery)   ## also nur die Studien, die zur discovery Kohorte gehören
+}, Subset_List)
 
-
-
-
-# Venn Diagramme
-#install.packages("VennDiagram")
-library(VennDiagram)
-venn.diagram(Study_List_Discovery, category.names = names(Study_List_Discovery),
-             filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
-             fill = c("cadetblue","olivedrab3", "khaki1", "indianred"))
+remove_diseases <- c("lehmann_gca", "lehmann_ibs", "lehmann_ca") ## Diese Krankheiten gehören nicht zur discovery Kohorte
+Subset_List_Discovery <- Subset_List_Discovery[!sapply(Subset_List_Discovery, function(df) unique(df[,4])) %in% remove_diseases]
 
 
 
@@ -210,7 +155,16 @@ venn.diagram(Study_List_Discovery, category.names = names(Study_List_Discovery),
 
 
 
-# Häufigkeit der gefundenen Metaproteine vergleichen
+
+
+
+
+
+
+
+
+
+# Gefundene Metaproteine und Häufigkeit nach Studien aufteilen
 
 Study_Counts <- lapply(studies, function(study_name) {
   ## Alle Samples nach Studien aufteilen
@@ -235,12 +189,38 @@ Study_Counts <- lapply(studies, function(study_name) {
 
 names(Study_Counts) <- studies
 
-Study_Counts_Discovery <- list(Study_Counts$Henry, Study_Counts$`Thuy-Boun`, Study_Counts$Lehmann, Study_Counts$`Lloyd-Price`)
-names(Study_Counts_Discovery) <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-Price")
+
+
+
+# Discovery
+Study_Counts_Discovery <- lapply(studies_discovery, function(study_name) {
+  ## Alle Samples nach Studien aufteilen
+  samples_in_study <- Subset_List_Discovery[sapply(Subset_List_Discovery, function(x) x[1, 3] == study_name)]
+  
+  ## Alle relevanten Zeilen aus diesen Samples zusammenführen
+  df_study <- do.call(rbind,
+                      lapply(samples_in_study,
+                             function(x) data.frame(Metaprotein.Number = x$Metaprotein.Number,
+                                                    Metaproteins_Found = x$Metaproteins_Found)))
+  
+  ## Nur Proteine behalten, die überhaupt gefunden wurden (>0)
+  df_study <- df_study[df_study$Metaproteins_Found > 0, ]
+  
+  ## Gesamtanzahl pro Protein berechnen
+  counts_per_protein <- aggregate(Metaproteins_Found ~ Metaprotein.Number,
+                                  data = df_study,
+                                  FUN = sum)
+  
+  return(counts_per_protein)
+})
+
+names(Study_Counts_Discovery) <- studies_discovery
+
+library(VennDiagram)
 venn.diagram(lapply(Study_Counts_Discovery, function(x) x[,1]), category.names = names(Study_Counts_Discovery),
              filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
              fill = c("cadetblue","olivedrab3", "khaki1", "indianred"))
-## Venndiagramm stimmt mit Study_List_Discovery überein
+
 
 
 
@@ -286,9 +266,8 @@ library(tidyr)
 library(ggplot2)
 library(patchwork)
 
-Subset_List_Discovery <- Filter(function(x) { ## Filter(): behält nur die Elemente der Liste, wo TRUE ist
-  any(unique(x[,3]) %in% studies_discovery)
-}, Subset_List)
+table(sapply(Subset_List_Discovery, function(x) unique(x[, 4])))
+table(sapply(Subset_List_Discovery, function(x) unique(x[, 5])))
 
 # Zielstruktur für Combat:
 # Zeilen = Metaproteine
