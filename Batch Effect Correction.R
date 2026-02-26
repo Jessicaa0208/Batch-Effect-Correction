@@ -149,6 +149,8 @@ Subset_List_Discovery <- Filter(function(x) { ## Filter(): behält nur die Eleme
 remove_diseases <- c("lehmann_gca", "lehmann_ibs", "lehmann_ca") ## Diese Krankheiten gehören nicht zur discovery Kohorte
 Subset_List_Discovery <- Subset_List_Discovery[!sapply(Subset_List_Discovery, function(df) unique(df[,4])) %in% remove_diseases]
 
+table(sapply(Subset_List_Discovery, function(x) unique(x[, 4])))
+table(sapply(Subset_List_Discovery, function(x) unique(x[, 5])))
 
 
 
@@ -265,9 +267,6 @@ library(purrr)
 library(tidyr)
 library(ggplot2)
 library(patchwork)
-
-table(sapply(Subset_List_Discovery, function(x) unique(x[, 4])))
-table(sapply(Subset_List_Discovery, function(x) unique(x[, 5])))
 
 # Zielstruktur für Combat:
 # Zeilen = Metaproteine
@@ -609,7 +608,17 @@ k_bet_harmony$summary
 
 
 
+# Paket batchelor ---------------------------------------------------------
 
+BiocManager::install("batchelor")
+library(batchelor)
+
+## Gefordetes Datenformat: Zeilen = Metaproteine, Spalten = Sample, Liste von Matrizen (jede Matrix ein Batch)
+
+batches <- lapply(split(seq_along(batch), batch),
+                  function(idx) as.matrix(matrix_df)[, idx])
+
+mnn_data <- fastMNN(batches) 
 
 
 
