@@ -151,7 +151,7 @@ Subset_List_Discovery <- Subset_List_Discovery[!sapply(Subset_List_Discovery, fu
 
 table(sapply(Subset_List_Discovery, function(x) unique(x[, 4])))
 table(sapply(Subset_List_Discovery, function(x) unique(x[, 5])))
-
+table(sapply(Subset_List_Discovery, function(x) unique(x[, 3])))
 
 
 
@@ -502,6 +502,16 @@ g2_harmony <- ggplot(df_after_harmony, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Nach harmony")
 
 g1_harmony + g2_harmony
+
+
+## Alle 4 in eine Grafik
+g1 <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor Korrektur")
+
+(g1 | g2_combat) /
+(g2_limma | g2_harmony)
+
+
 
 
 
