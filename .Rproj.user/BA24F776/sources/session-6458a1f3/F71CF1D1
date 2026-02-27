@@ -1,0 +1,28 @@
+{
+    "id": "F71CF1D1",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1772007675894.0,
+    "source_on_save": false,
+    "relative_order": 12,
+    "properties": {
+        "id": "3166a9ea31dd4ce5a000d53a80c9350a",
+        "name": "Subset_List_Discovery",
+        "title": "Subset_List_Discovery",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 32932993188560996,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1772007675894,
+    "read_only": false,
+    "read_only_alternatives": []
+}

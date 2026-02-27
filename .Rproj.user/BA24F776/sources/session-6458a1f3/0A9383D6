@@ -1,0 +1,26 @@
+{
+    "id": "0A9383D6",
+    "path": "~/Uni/3. Mastersemester Statistik/Praktikum/Batch-Effect-Correction/Batch Effect Correction.R",
+    "project_path": "Batch Effect Correction.R",
+    "type": "r_source",
+    "hash": "1905192660",
+    "contents": "",
+    "dirty": false,
+    "created": 1771493280618.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "716,0",
+        "scrollLine": "687"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1772180165,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1772180165358,
+    "read_only": false,
+    "read_only_alternatives": []
+}
