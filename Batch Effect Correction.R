@@ -168,6 +168,8 @@ table(sapply(Subset_List_Discovery, function(x) unique(x[, 5])))
 
 # Gefundene Metaproteine und Häufigkeit nach Studien aufteilen
 
+studies <-  names(table(sapply(Subset_List, function(x) x[,3])))
+
 Study_Counts <- lapply(studies, function(study_name) {
   ## Alle Samples nach Studien aufteilen
   samples_in_study <- Subset_List[sapply(Subset_List, function(x) x[1, 3] == study_name)]
@@ -684,16 +686,16 @@ install_github('theislab/kBET')
 library(kBET)
 set.seed(2)
 
-k_bet <- kBET(as.matrix(matrix_df), batch = batch, plot = FALSE)
+k_bet <- kBET(as.matrix(matrix_df), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet$summary
 
-k_bet_combat <- kBET(combat_data, batch = batch, plot = FALSE)
+k_bet_combat <- kBET(combat_data, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_combat$summary
 
-k_bet_limma <- kBET(limma_data, batch = batch, plot = FALSE)
+k_bet_limma <- kBET(limma_data, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_limma$summary
 
-k_bet_harmony <- kBET(harmony_data, batch = batch, plot = FALSE)
+k_bet_harmony <- kBET(harmony_data, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_harmony$summary
 
 
