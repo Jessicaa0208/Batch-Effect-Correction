@@ -328,19 +328,7 @@ g1_combat + g2_combat
 
 
 
-## Normalisierte Daten
-pca_before_norm <- prcomp(t(matrix_df_norm))
-pca_after_combat_norm  <- prcomp(t(combat_data_norm))
 
-df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
-g1_combat_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor ComBat (normalisiert)")
-
-df_after_combat_norm <- data.frame(pca_after_combat_norm$x[,1:2], batch=batch)
-g2_combat_norm <- ggplot(df_after_combat_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach ComBat (normalisiert)")
-
-g1_combat_norm + g2_combat_norm
 
 
 
@@ -355,11 +343,11 @@ pca_before <- prcomp(t(matrix_df))
 pca_after_combat  <- prcomp(t(combat_data))
 
 df_condition_before <- data.frame(pca_before$x[,1:2], condition=batch_condition)
-g1_condition_combat <- ggplot(df_before, aes(PC1, PC2, color=batch_condition)) +
+g1_condition_combat <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Vor ComBat")
 
 df_condition_after_combat <- data.frame(pca_after_combat$x[,1:2], condition=batch_condition)
-g2_condition_combat <- ggplot(df_after_combat, aes(PC1, PC2, color=batch_condition)) +
+g2_condition_combat <- ggplot(df_condition_after_combat, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Nach ComBat")
 
 g1_condition_combat + g2_condition_combat
@@ -409,6 +397,7 @@ library(limma)
 
 limma_data <- removeBatchEffect(as.matrix(matrix_df), batch = batch)
 
+
 # PCA zur Kontrolle der Batch Korrektur
 pca_before <- prcomp(t(matrix_df))
 pca_after_limma  <- prcomp(t(limma_data))
@@ -425,22 +414,7 @@ g1_limma + g2_limma
 
 
 
-# Normalisierte Daten
-limma_data_norm <- removeBatchEffect(as.matrix(matrix_df_norm), batch = batch)
 
-
-pca_before_norm <- prcomp(t(matrix_df_norm))
-pca_after_limma_norm  <- prcomp(t(limma_data_norm))
-
-df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
-g1_limma_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor limma (normalisiert)")
-
-df_after_limma_norm <- data.frame(pca_after_limma_norm$x[,1:2], batch=batch)
-g2_limma_norm <- ggplot(df_after_limma_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach limma (normalisiert)")
-
-g1_limma_norm + g2_limma_norm
 
 
 
@@ -450,11 +424,11 @@ pca_before <- prcomp(t(matrix_df))
 pca_after_limma  <- prcomp(t(limma_data))
 
 df_condition_before <- data.frame(pca_before$x[,1:2], condition=batch_condition)
-g1_condition_limma <- ggplot(df_before, aes(PC1, PC2, color=batch_condition)) +
+g1_condition_limma <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Vor limma")
 
 df_condition_after_limma <- data.frame(pca_after_limma$x[,1:2], condition=batch_condition)
-g2_condition_limma <- ggplot(df_after_limma, aes(PC1, PC2, color=batch_condition)) +
+g2_condition_limma <- ggplot(df_condition_after_limma, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Nach limma")
 
 g1_condition_limma + g2_condition_limma
@@ -516,22 +490,35 @@ g1 <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
 
 
 
-# Normalisierte Daten
-harmony_data_norm <- RunHarmony(data_mat = as.matrix(t(matrix_df_norm)), meta_data = batch, vars_use = "batch")
 
 
-pca_before_norm <- prcomp(t(matrix_df_norm))
-pca_after_harmony_norm  <- prcomp(harmony_data_norm) ## prcomp erwartet Samples als Zeilen, was hier schon der Fall ist
 
-df_before_norm <- data.frame(pca_before_norm$x[,1:2], condition=batch)
-g1_harmony_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor harmony (normalisiert)")
+# Condition betrachten
+pca_before <- prcomp(t(matrix_df))
+pca_after_harmony  <- prcomp(harmony_data) ## prcomp erwartet Samples als Zeilen, was hier schon der Fall ist
 
-df_after_harmony_norm <- data.frame(pca_after_harmony_norm$x[,1:2], condition=batch)
-g2_harmony_norm <- ggplot(df_after_harmony_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach harmony (normalisiert)")
+df_condition_before <- data.frame(pca_before$x[,1:2], condition=batch_condition)
+g1_condition_harmony <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Vor harmony")
 
-g1_harmony_norm + g2_harmony_norm
+df_condition_after_harmony <- data.frame(pca_after_harmony$x[,1:2], condition=batch_condition)
+g2_condition_harmony <- ggplot(df_condition_after_harmony, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach harmony")
+
+
+
+## Alle 4 in eine Grafik
+g1_condition <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Vor Korrektur")
+
+(g1_condition | g2_condition_combat) /
+(g2_condition_limma | g2_condition_harmony)
+
+
+
+
+
+
 
 
 
