@@ -727,9 +727,6 @@ k_bet_harmony$summary
 # PERMANOVA
 library(vegan)
 
-Sup_File_Discovery$study <- as.factor(Sup_File_Discovery$study)
-all(rownames(Sup_File_Discovery) == attr(D_before, "Labels"))
-
 set.seed(2)
 fit_adonis_before <- adonis2(dist_matrix_before ~ study, data = Sup_File_Discovery)
 fit_adonis_after_ComBat <- adonis2(dist_matrix_after_combat ~ study, data = Sup_File_Discovery)
