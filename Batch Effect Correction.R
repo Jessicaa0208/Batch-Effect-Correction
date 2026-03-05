@@ -533,6 +533,56 @@ g1_condition <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_condition)
 
 
 
+# Paket MMUPHin -----------------------------------------------------------
+
+#BiocManager::install("MMUPHin")
+library(MMUPHin)
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+
+## adjust_batch fordert feature matrix mit Samples als Spalten und Meta dataframe mit Samples als Zeilennamen
+## und study als Spalte
+studies_discovery <- c("Henry", "Thuy-Boun", "Lehmann", "Lloyd-Price")
+Sup_File_Discovery <- Sup_File[Sup_File$study %in% studies_discovery,]
+remove_diseases2 <- c("GCA", "IBS", "CA")
+Sup_File_Discovery <- Sup_File_Discovery[!Sup_File_Discovery$disease %in% remove_diseases2,]
+rownames(Sup_File_Discovery) <- Sup_File_Discovery$ID ## Samples sollen Zeilennamen sein
+Sup_File_Discovery$ID <- NULL
+all(colnames(matrix_df) == rownames(Sup_File_Discovery)) ## prüfen, ob Reihenfolge der Samples übereinstimmt
+
+
+
+MMUPHin_data <- adjust_batch(feature_abd = matrix_df, batch = "study", data = Sup_File_Discovery)
+
+
+
+
+pca_before <- prcomp(t(matrix_df))
+pca_after_MMUPHin <- prcomp(t(MMUPHin_data$feature_abd_adj))
+
+df_before <- data.frame(pca_before$x[,1:2], condition=batch)
+g1_MMUPHin <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor MMUPHin")
+
+df_after_MMUPHin <- data.frame(pca_after_MMUPHin$x[,1:2], condition=batch)
+g2_MMUPHin <- ggplot(df_after_MMUPHin, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach MMUPHin")
+
+g1_MMUPHin + g2_MMUPHin
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Quantifizierung der Batch Effect Correction -----------------------------
@@ -576,56 +626,25 @@ dist_matrix_after_harmony <- dist(coords_after_harmony)
 sil_after_harmony <- silhouette(as.numeric(batch_labels), dist_matrix_after_harmony)
 
 
+
+## after MMUPHin
+coords_after_MMUPHin <- pca_after_MMUPHin$x
+
+dist_matrix_after_MMUPHin <- dist(coords_after_MMUPHin)
+
+sil_after_MMUPHin <- silhouette(as.numeric(batch_labels), dist_matrix_after_MMUPHin)
+
+
 ## Vergleich average Silhouetten Score before und after
 mean(sil_before[, "sil_width"])
 mean(sil_after_combat[, "sil_width"])
 mean(sil_after_limma[, "sil_width"])
 mean(sil_after_harmony[, "sil_width"])
+mean(sil_after_MMUPHin[, "sil_width"])
 
 
 
 
-# Normalisierte Daten
-
-## before
-coords_before_norm <- pca_before_norm$x
-
-dist_matrix_before_norm <- dist(coords_before_norm)
-
-sil_before_norm <- silhouette(as.numeric(batch_labels), dist_matrix_before_norm)
-
-
-## after combat
-coords_after_combat_norm <- pca_after_combat_norm$x
-
-dist_matrix_after_combat_norm <- dist(coords_after_combat_norm)
-
-sil_after_combat_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_combat_norm)
-
-
-
-## after limma
-coords_after_limma_norm <- pca_after_limma_norm$x
-
-dist_matrix_after_limma_norm <- dist(coords_after_limma_norm)
-
-sil_after_limma_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_limma_norm)
-
-
-
-## after harmony
-coords_after_harmony_norm <- pca_after_harmony_norm$x
-
-dist_matrix_after_harmony_norm <- dist(coords_after_harmony_norm)
-
-sil_after_harmony_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_harmony_norm)
-
-
-## Vergleich average Silhouetten Score before und after
-mean(sil_before_norm[, "sil_width"])
-mean(sil_after_combat_norm[, "sil_width"])
-mean(sil_after_limma_norm[, "sil_width"])
-mean(sil_after_harmony_norm[, "sil_width"])
 
 
 
@@ -694,6 +713,37 @@ k_bet_limma$summary
 
 k_bet_harmony <- kBET(harmony_data, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_harmony$summary
+
+
+
+
+
+
+
+
+
+
+
+# PERMANOVA
+library(vegan)
+
+Sup_File_Discovery$study <- as.factor(Sup_File_Discovery$study)
+all(rownames(Sup_File_Discovery) == attr(D_before, "Labels"))
+
+set.seed(2)
+fit_adonis_before <- adonis2(dist_matrix_before ~ study, data = Sup_File_Discovery)
+fit_adonis_after_ComBat <- adonis2(dist_matrix_after_combat ~ study, data = Sup_File_Discovery)
+fit_adonis_after_limma <- adonis2(dist_matrix_after_limma ~ study, data = Sup_File_Discovery)
+fit_adonis_after_harmony <- adonis2(dist_matrix_after_harmony ~ study, data = Sup_File_Discovery)
+fit_adonis_after_MMUPHin <- adonis2(dist_matrix_after_MMUPHin ~ study, data = Sup_File_Discovery)
+print(fit_adonis_before)
+print(fit_adonis_after_ComBat)
+print(fit_adonis_after_limma)
+print(fit_adonis_after_harmony)
+print(fit_adonis_after_MMUPHin)
+
+
+
 
 
 
