@@ -727,19 +727,33 @@ k_bet_harmony$summary
 # PERMANOVA
 library(vegan)
 
+## Erklärte Varianz durch die Studien
 set.seed(2)
-fit_adonis_before <- adonis2(dist_matrix_before ~ study, data = Sup_File_Discovery)
-fit_adonis_after_ComBat <- adonis2(dist_matrix_after_combat ~ study, data = Sup_File_Discovery)
-fit_adonis_after_limma <- adonis2(dist_matrix_after_limma ~ study, data = Sup_File_Discovery)
-fit_adonis_after_harmony <- adonis2(dist_matrix_after_harmony ~ study, data = Sup_File_Discovery)
-fit_adonis_after_MMUPHin <- adonis2(dist_matrix_after_MMUPHin ~ study, data = Sup_File_Discovery)
-print(fit_adonis_before)
+fit_adonis_before <- adonis2(dist_matrix_before ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_ComBat <- adonis2(dist_matrix_after_combat ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_limma <- adonis2(dist_matrix_after_limma ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_harmony <- adonis2(dist_matrix_after_harmony ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_MMUPHin <- adonis2(dist_matrix_after_MMUPHin ~ study, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_before) 
 print(fit_adonis_after_ComBat)
 print(fit_adonis_after_limma)
 print(fit_adonis_after_harmony)
 print(fit_adonis_after_MMUPHin)
 
 
+
+## Erklärte Varianz durch die Krankheit
+set.seed(2)
+fit_adonis_condition_before <- adonis2(dist_matrix_before ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_ComBat <- adonis2(dist_matrix_after_combat ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_limma <- adonis2(dist_matrix_after_limma ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_harmony <- adonis2(dist_matrix_after_harmony ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_MMUPHin <- adonis2(dist_matrix_after_MMUPHin ~ condition, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_condition_before)
+print(fit_adonis_condition_after_ComBat)
+print(fit_adonis_condition_after_limma)
+print(fit_adonis_condition_after_harmony)
+print(fit_adonis_condition_after_MMUPHin)
 
 
 
