@@ -714,6 +714,9 @@ k_bet_limma$summary
 k_bet_harmony <- kBET(harmony_data, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_harmony$summary
 
+k_bet_MMUPHin <- kBET(MMUPHin_data$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_MMUPHin$summary
+
 
 
 
@@ -754,6 +757,104 @@ print(fit_adonis_condition_after_ComBat)
 print(fit_adonis_condition_after_limma)
 print(fit_adonis_condition_after_harmony)
 print(fit_adonis_condition_after_MMUPHin)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Biomarker Analyse -------------------------------------------------------
+
+# Erklärte Varianz der Krankheit vor der batch Korrektur
+r2 <- apply(matrix_df, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20 <- names(r2)[r2 > 0.20]
+proteins_over20 ## NAs können entstehen, wenn kein R^2 berechnet werden kann (zB wenn alle Werte von einem Protein gleich sind)
+proteins_over20 <- proteins_over20[!is.na(proteins_over20)] ## NAs entfernen
+table(proteins_over20)
+
+
+
+
+# Erklärte Varianz der Krankheit nach Combat
+r2_ComBat <- apply(combat_data, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_ComBat <- names(r2_ComBat)[r2_ComBat > 0.2]
+proteins_over20_ComBat <- proteins_over20_ComBat[!is.na(proteins_over20_ComBat)]
+table(proteins_over20_ComBat)
+length(table(proteins_over20_ComBat))
+
+proteins_over20 %in% proteins_over20_ComBat ## Wurden die Metaproteine, die vorher als Biomarker identifiziert
+                                            ## wurden, danach auch identifiziert
+
+
+
+
+# Erklärte Varianzder Krankheit nach limma
+r2_limma <- apply(limma_data, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_limma <- names(r2_limma)[r2_limma > 0.2]
+proteins_over20_limma <- proteins_over20_limma[!is.na(proteins_over20_limma)]
+table(proteins_over20_limma)
+length(table(proteins_over20_limma))
+
+proteins_over20 %in% proteins_over20_limma
+
+
+
+
+# Erklärte Varianz der Krankheit nach harmony
+r2_harmony <- apply(t(harmony_data), 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_harmony <- names(r2_harmony)[r2_harmony > 0.2]
+proteins_over20_harmony <- proteins_over20_harmony[!is.na(proteins_over20_harmony)]
+table(proteins_over20_harmony)
+length(table(proteins_over20_harmony))
+
+proteins_over20 %in% proteins_over20_harmony
+
+
+
+
+# Erklärte Varianz der Krankheit nach MMUPHin
+r2_MMUPHin <- apply(MMUPHin_data$feature_abd_adj, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_MMUPHin <- names(r2_MMUPHin)[r2_MMUPHin > 0.2]
+proteins_over20_MMUPHin <- proteins_over20_MMUPHin[!is.na(proteins_over20_MMUPHin)]
+table(proteins_over20_MMUPHin)
+length(table(proteins_over20_MMUPHin))
+
+proteins_over20 %in% proteins_over20_MMUPHin
+
+
+
+
 
 
 
