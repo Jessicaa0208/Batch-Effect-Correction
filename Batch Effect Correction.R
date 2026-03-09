@@ -220,10 +220,13 @@ Study_Counts_Discovery <- lapply(studies_discovery, function(study_name) {
 
 names(Study_Counts_Discovery) <- studies_discovery
 
+shared_metaproteins <- Reduce(intersect, lapply(Study_Counts_Discovery, function(x) x[,1])) ## geteilte Metaproteine
+
 library(VennDiagram)
 venn.diagram(lapply(Study_Counts_Discovery, function(x) x[,1]), category.names = names(Study_Counts_Discovery),
              filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
              fill = c("cadetblue","olivedrab3", "khaki1", "indianred"))
+
 
 
 
@@ -786,6 +789,9 @@ proteins_over20 <- names(r2)[r2 > 0.20]
 proteins_over20 ## NAs können entstehen, wenn kein R^2 berechnet werden kann (zB wenn alle Werte von einem Protein gleich sind)
 proteins_over20 <- proteins_over20[!is.na(proteins_over20)] ## NAs entfernen
 table(proteins_over20)
+Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==2024]
+Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==22]
+Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==33284]
 
 
 
@@ -876,7 +882,9 @@ proteins_over20 %in% proteins_over20_MMUPHin
 # Paket batchelor ---------------------------------------------------------
 
 BiocManager::install("batchelor")
+BiocManager::install("scater")
 library(batchelor)
+library(scater)
 
 ## Gefordetes Datenformat: Zeilen = Metaproteine, Spalten = Sample, Liste von Matrizen (jede Matrix ein Batch)
 
@@ -885,6 +893,13 @@ batches <- lapply(split(seq_along(batch), batch),
 
 mnn_data <- fastMNN(batches) 
 
+mnn_data_df <- t(as.data.frame(reducedDim(mnn_data, "corrected")))
+
+mnn_data_tsne <- runTSNE(mnn_data, dimred = "corrected")
+plotTSNE(mnn_data_tsne, colour_by = "batch")
+
+pca_after_mnn <- runPCA(mnn_data, dimred = "corrected")
+plotReducedDim(pca_after_mnn, dimred = "PCA", colour_by = "batch")
 
 
 
@@ -892,82 +907,119 @@ mnn_data <- fastMNN(batches)
 
 
 
-# Paket MultiBaC (Ugidos et al. 2022) ------------------------------------
-
-BiocManager::install("MultiBaC")
-browseVignettes("MultiBaC")
-library("MultiBaC")
-
-mbac_data <- createMbac(inputOmics = as.matrix(matrix_df), batchFactor = batch_labels,
-                        experimentalDesign = NULL, omicNames = Metaprotein.Number)
-
-
-
-
-data("multiyeast")
-## createMbac: generiert eine Listenobjekt, welches für weitere Mbac Funktionen benötigt wird
-my_mbac <- createMbac(inputOmics = list(A.rna, A.gro, B.rna, B.ribo, C.rna, C.par),
-                      batchFactor = c("A", "A", "B", "B", "C", "C"),
-                      experimentalDesign = list("A" = c("Glu+", "Glu+",
-                                                        "Glu+", "Glu-", "Glu-", "Glu-"),
-                                                "B" = c("Glu+", "Glu+", "Glu-", "Glu-"),
-                                                "C" = c("Glu+", "Glu+", "Glu-", "Glu-")),
-                      omicNames = c("RNA", "GRO", "RNA", "RIBO", "RNA", "PAR"))
-
-## batchEstPlot: This function uses linear models to estimate the batch effect magnitude using the common data
-## across batches. It compares the result with theoretical distribution of diferrent levels of batch magnitude
-batchEstPlot(my_mbac) 
-
-
-
-## genModelList: This function performs PLS models for every batch. A PLS model is generated for each noncommon omic in each batch
-my_mbac_2 <- genModelList(my_mbac, test.comp = NULL,
-                          scale = FALSE, center = TRUE,
-                          crossval = NULL,
-                          showinfo = TRUE)
-
-## genMissingOmics: This function generates for all the batches the omic data they had not originally. This is the previous
-## step to apply ARSyNbac [1] correction
-multiBatchDesign <- genMissingOmics(my_mbac_2)
-
-## batchCorrection: Batch Correction mit ARSyNbac correction
-my_finalwise_mbac <- batchCorrection(my_mbac_2,
-                                     multiBatchDesign = multiBatchDesign,
-                                     Interaction = FALSE,
-                                     Variability = 0.9)
-
-
-## MultiBaC: Batch Correction mit MultiBaC correction
-my_final_mbac <- MultiBaC(my_mbac,
-                          test.comp = NULL, scale = FALSE,
-                          center = TRUE, crossval = NULL,
-                          Variability = 0.90,
-                          Interaction = TRUE ,
-                          showplot = FALSE,
-                          showinfo = FALSE)
-
-
-plot(my_final_mbac) ## Enthält explained_varPlot und Q2_plot (MultiBaC)
-plot(my_finalwise_mbac) ## Enthält explained_varPlot und Q2_plot (ARSyNbac)
-
-plot_pca(my_mbac, typeP = "pca.org") ## pca plot for original data
-plot_pca(my_final_mbac, typeP = "pca.cor") ## pca plot for corrected data (MultiBaC)
-plot_pca(my_finalwise_mbac, typeP = "pca.cor") ## pca plot for corrected data (ARSyNbac)
-
-inner_relPlot (my_final_mbac)
-par(mfrow=c(1,1))
-
-summary(my_mbac)
 
 
 
 
 
 
-# Paket batchtma ----------------------------------------------------------
 
-remotes::install_github("stopsack/batchtma")
-library(batchtma)
 
-adjust_batch(data = matrix_df, markers = as.matrix(matrix_df), batch = batch, method = simple)
+
+
+
+
+
+
+
+
+
+
+# Gleiche Analyse mit 1620 shared Metaproteinen ---------------------------
+
+shared_metaproteins <- Reduce(intersect, lapply(Study_Counts_Discovery, function(x) x[,1])) ## geteilte Metaproteine
+Subset_List_Discovery_shared <- lapply(Subset_List_Discovery, function(x){
+  x[x[[1]] %in% shared_metaproteins, ] ## nur geteilte Metaproteine behalten
+})
+
+
+
+## Daten für batch Korrektur vorbereiten
+sample_names_shared <- names(Subset_List_Discovery_shared) ## Namen der Samples aus der Liste
+study_names_shared <- sapply(Subset_List_Discovery_shared, function(x) unique(x[,3])) ## vektor der angibt zu welcher Studie jedes Sample gehört
+
+
+Subset_List_Discovery_shared <- imap(Subset_List_Discovery_shared, ~ mutate(.x, Sample = .y)) ## Allen Dataframes in der Liste die Spalte Sample hinzufügen
+df_long_shared <- bind_rows(Subset_List_Discovery_shared) ## Kombiniere alle Samples in einen langen Dataframe
+names(df_long_shared) <- c("Metaprotein.Number", "Metaproteins_Found", "study", "study2", "disease", "condition", "batch", "Sample")
+
+## In breites Format umwandeln
+matrix_df_shared <- df_long_shared |> 
+  select("Metaprotein.Number", "Sample", "Metaproteins_Found") |> 
+  pivot_wider(names_from = "Sample",
+              values_from = "Metaproteins_Found",
+              values_fill = list(Metaproteins_Found = NA)) |>
+  as.data.frame()
+
+## Metaprotein.Number als Zeilen des Dataframes umwandeln
+rownames(matrix_df_shared) <- matrix_df_shared$Metaprotein.Number
+matrix_df_shared <- matrix_df_shared[, -1]
+
+
+
+
+## ComBat
+combat_data_shared <- ComBat(as.matrix(matrix_df_shared), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
+
+## limma
+limma_data_shared <- removeBatchEffect(as.matrix(matrix_df_shared), batch = batch)
+
+## harmony
+harmony_data_shared <- RunHarmony(data_mat = as.matrix(t(matrix_df_shared)), meta_data = batch, vars_use = "batch")
+
+## MMUPHin
+MMUPHin_data_shared <- adjust_batch(feature_abd = matrix_df_shared, batch = "study", data = Sup_File_Discovery)
+
+
+
+## PCA plots
+pca_shared_before <- prcomp(t(matrix_df_shared))
+pca_shared_after_combat  <- prcomp(t(combat_data_shared))
+
+df_shared_after_combat <- data.frame(pca_shared_after_combat$x[,1:2], batch=batch)
+g2_shared_combat <- ggplot(df_shared_after_combat, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach ComBat")
+
+
+
+pca_shared_after_limma  <- prcomp(t(limma_data_shared))
+
+df_shared_after_limma <- data.frame(pca_shared_after_limma$x[,1:2], batch=batch)
+g2_shared_limma <- ggplot(df_shared_after_limma, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach limma")
+
+
+
+
+
+pca_shared_after_harmony  <- prcomp(harmony_data_shared) ## prcomp erwartet Samples als Zeilen, was hier schon der Fall ist
+
+df_shared_after_harmony <- data.frame(pca_shared_after_harmony$x[,1:2], condition=batch)
+g2_shared_harmony <- ggplot(df_shared_after_harmony, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach harmony")
+
+
+
+
+
+pca_shared_after_MMUPHin <- prcomp(t(MMUPHin_data_shared$feature_abd_adj))
+
+df_shared_after_MMUPHin <- data.frame(pca_shared_after_MMUPHin$x[,1:2], condition=batch)
+g2_shared_MMUPHin <- ggplot(df_shared_after_MMUPHin, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach MMUPHin")
+
+
+df_shared_before <- data.frame(pca_shared_before$x[,1:2], batch=batch)
+g1_shared <- ggplot(df_shared_before, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor Korrektur")
+
+
+
+
+(g1_shared | g2_shared_combat) /
+  (g2_shared_limma | g2_shared_harmony)
+
+
+(g2_shared_MMUPHin | g2_shared_combat) /
+  (g2_shared_limma | g2_shared_harmony)
 
