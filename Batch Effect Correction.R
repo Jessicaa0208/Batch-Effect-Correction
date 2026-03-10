@@ -779,6 +779,9 @@ print(fit_adonis_condition_after_MMUPHin)
 
 # Biomarker Analyse -------------------------------------------------------
 
+study_condition <- sapply(Subset_List_Discovery, function(x) unique(x[, 6]))
+batch_condition <- study_condition[match(colnames(matrix_df), names(study_condition))]
+
 # Erklärte Varianz der Krankheit vor der batch Korrektur
 r2 <- apply(matrix_df, 1, function(x) {
   model <- lm(x ~ batch_condition)
@@ -1022,4 +1025,228 @@ g1_shared <- ggplot(df_shared_before, aes(PC1, PC2, color=batch)) +
 
 (g2_shared_MMUPHin | g2_shared_combat) /
   (g2_shared_limma | g2_shared_harmony)
+g1_shared
+
+
+
+
+
+
+
+## Quantifizierung
+
+# Silhouette Score
+library(cluster)
+
+batch_labels <- as.factor(batch)
+
+## before
+coords_shared_before <- pca_shared_before$x
+
+dist_matrix_shared_before <- dist(coords_shared_before)
+
+sil_shared_before <- silhouette(as.numeric(batch_labels), dist_matrix_shared_before)
+
+
+## after combat
+coords_shared_after_combat <- pca_shared_after_combat$x
+
+dist_matrix_shared_after_combat <- dist(coords_shared_after_combat)
+
+sil_shared_after_combat <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_combat)
+
+
+
+## after limma
+coords_shared_after_limma <- pca_shared_after_limma$x
+
+dist_matrix_shared_after_limma <- dist(coords_shared_after_limma)
+
+sil_shared_after_limma <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_limma)
+
+
+
+## after harmony
+coords_shared_after_harmony <- pca_shared_after_harmony$x
+
+dist_matrix_shared_after_harmony <- dist(coords_shared_after_harmony)
+
+sil_shared_after_harmony <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_harmony)
+
+
+
+## after MMUPHin
+coords_shared_after_MMUPHin <- pca_shared_after_MMUPHin$x
+
+dist_matrix_shared_after_MMUPHin <- dist(coords_shared_after_MMUPHin)
+
+sil_shared_after_MMUPHin <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_MMUPHin)
+
+
+## Vergleich average Silhouetten Score before und after
+mean(sil_shared_before[, "sil_width"])
+mean(sil_shared_after_combat[, "sil_width"])
+mean(sil_shared_after_limma[, "sil_width"])
+mean(sil_shared_after_harmony[, "sil_width"])
+mean(sil_shared_after_MMUPHin[, "sil_width"])
+
+
+
+
+
+
+# kBET
+library(kBET)
+set.seed(2)
+
+k_bet_shared <- kBET(as.matrix(matrix_df_shared), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared$summary
+
+k_bet_shared_combat <- kBET(combat_data_shared, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_combat$summary
+
+k_bet_shared_limma <- kBET(limma_data_shared, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_limma$summary
+
+k_bet_shared_harmony <- kBET(harmony_data_shared, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_harmony$summary
+
+k_bet_shared_MMUPHin <- kBET(MMUPHin_data_shared$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_MMUPHin$summary
+
+
+
+
+
+
+
+# PERMANOVA
+library(vegan)
+
+## Erklärte Varianz durch die Studien
+set.seed(2)
+fit_adonis_shared_before <- adonis2(dist_matrix_shared_before ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_ComBat <- adonis2(dist_matrix_shared_after_combat ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_limma <- adonis2(dist_matrix_shared_after_limma ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_harmony <- adonis2(dist_matrix_shared_after_harmony ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_MMUPHin <- adonis2(dist_matrix_shared_after_MMUPHin ~ study, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_shared_before) 
+print(fit_adonis_shared_after_ComBat)
+print(fit_adonis_shared_after_limma)
+print(fit_adonis_shared_after_harmony)
+print(fit_adonis_shared_after_MMUPHin)
+
+
+
+## Erklärte Varianz durch die Krankheit
+set.seed(2)
+fit_adonis_shared_condition_before <- adonis2(dist_matrix_shared_before ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_ComBat <- adonis2(dist_matrix_shared_after_combat ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_limma <- adonis2(dist_matrix_shared_after_limma ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_harmony <- adonis2(dist_matrix_shared_after_harmony ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_MMUPHin <- adonis2(dist_matrix_shared_after_MMUPHin ~ condition, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_shared_condition_before)
+print(fit_adonis_shared_condition_after_ComBat)
+print(fit_adonis_shared_condition_after_limma)
+print(fit_adonis_shared_condition_after_harmony)
+print(fit_adonis_shared_condition_after_MMUPHin)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Biomarker Analyse
+
+study_condition <- sapply(Subset_List_Discovery, function(x) unique(x[, 6]))
+batch_condition <- study_condition[match(colnames(matrix_df), names(study_condition))]
+
+# Erklärte Varianz der Krankheit vor der batch Korrektur
+r2_shared <- apply(matrix_df_shared, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_shared <- names(r2_shared)[r2_shared > 0.20]
+proteins_over20_shared ## NAs können entstehen, wenn kein R^2 berechnet werden kann (zB wenn alle Werte von einem Protein gleich sind)
+proteins_over20_shared <- proteins_over20_shared[!is.na(proteins_over20_shared)] ## NAs entfernen
+table(proteins_over20_shared)
+Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==2024]
+Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==22]
+Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==33284]
+
+
+
+
+# Erklärte Varianz der Krankheit nach Combat
+r2_shared_ComBat <- apply(combat_data_shared, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_shared_ComBat <- names(r2_shared_ComBat)[r2_shared_ComBat > 0.2]
+proteins_over20_shared_ComBat <- proteins_over20_shared_ComBat[!is.na(proteins_over20_shared_ComBat)]
+table(proteins_over20_shared_ComBat)
+length(table(proteins_over20_shared_ComBat))
+
+proteins_over20_shared %in% proteins_over20_shared_ComBat ## Wurden die Metaproteine, die vorher als Biomarker identifiziert
+## wurden, danach auch identifiziert
+
+
+
+
+# Erklärte Varianzder Krankheit nach limma
+r2_shared_limma <- apply(limma_data_shared, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_shared_limma <- names(r2_shared_limma)[r2_shared_limma > 0.2]
+proteins_over20_shared_limma <- proteins_over20_shared_limma[!is.na(proteins_over20_shared_limma)]
+table(proteins_over20_shared_limma)
+length(table(proteins_over20_shared_limma))
+
+proteins_over20_shared %in% proteins_over20_shared_limma
+
+
+
+
+# Erklärte Varianz der Krankheit nach harmony
+r2_shared_harmony <- apply(t(harmony_data_shared), 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_shared_harmony <- names(r2_shared_harmony)[r2_shared_harmony > 0.2]
+proteins_over20_shared_harmony <- proteins_over20_shared_harmony[!is.na(proteins_over20_shared_harmony)]
+table(proteins_over20_shared_harmony)
+length(table(proteins_over20_shared_harmony))
+
+proteins_over20_shared %in% proteins_over20_shared_harmony
+
+
+
+
+# Erklärte Varianz der Krankheit nach MMUPHin
+r2_shared_MMUPHin <- apply(MMUPHin_data_shared$feature_abd_adj, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_shared_MMUPHin <- names(r2_shared_MMUPHin)[r2_shared_MMUPHin > 0.2]
+proteins_over20_shared_MMUPHin <- proteins_over20_shared_MMUPHin[!is.na(proteins_over20_shared_MMUPHin)]
+table(proteins_over20_shared_MMUPHin)
+length(table(proteins_over20_shared_MMUPHin))
+
+proteins_over20_shared %in% proteins_over20_shared_MMUPHin
+
+
+
 
