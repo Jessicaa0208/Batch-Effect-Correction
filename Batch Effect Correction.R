@@ -1271,6 +1271,28 @@ proteins_over20_shared %in% proteins_over20_shared_ComBat ## Wurden die Metaprot
 ## wurden, danach auch identifiziert
 
 
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==124),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==132),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==156),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==1673),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==1703),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==204),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==366),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==37164),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==400),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==4293),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==75),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==803),]), batch_condition, sum)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==9040),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==9510),]), batch_condition, sum) ## sehr deutlich
+
+
+
+
+
+
+
 
 
 # Erklärte Varianzder Krankheit nach limma
@@ -1285,6 +1307,21 @@ table(proteins_over20_shared_limma)
 length(table(proteins_over20_shared_limma))
 
 proteins_over20_shared %in% proteins_over20_shared_limma
+
+
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==1078),]), batch_condition, sum)
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==1673),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==37164),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==4293),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==627),]), batch_condition, sum)
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==803),]), batch_condition, sum) ## deutlich
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==9040),]), batch_condition, sum) ## sehr deutlich
+## Alle die bei limma als Biomarker gefunden wurden, wurden häufiger in diseased gefunden als in control
+
+
+
+
 
 
 
@@ -1303,6 +1340,27 @@ length(table(proteins_over20_shared_harmony))
 proteins_over20_shared %in% proteins_over20_shared_harmony
 
 
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1032),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1078),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==132),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1712),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==2403),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==37164),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==4293),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==532),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==688),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==75),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==803),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==9040),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==998),]), batch_condition, sum)
+
+
+
+
+
+
+
 
 
 # Erklärte Varianz der Krankheit nach MMUPHin
@@ -1318,6 +1376,10 @@ length(table(proteins_over20_shared_MMUPHin))
 
 proteins_over20_shared %in% proteins_over20_shared_MMUPHin
 
+
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(MMUPHin_data_shared$feature_abd_adj[which(rownames(MMUPHin_data_shared$feature_abd_adj)==803),]), batch_condition, sum)
+## Alle die bei MMUPHin als Biomarker gefunden wurden, wurden häufiger in control gefunden als in diseased
 
 
 
