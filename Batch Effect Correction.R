@@ -576,6 +576,9 @@ g1_MMUPHin + g2_MMUPHin
 
 
 
+g1
+(g2_MMUPHin | g2_combat) /
+  (g2_limma | g2_harmony)
 
 
 
@@ -796,6 +799,12 @@ Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==2024]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==22]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==33284]
 
+## Wie oft wurden diese Metaproteine gefunden (in control vs. diseased)
+matrix_df[which(rownames(matrix_df)==2024),]
+tapply(as.numeric(matrix_df[which(rownames(matrix_df)==2024),]), batch_condition, sum)
+tapply(as.numeric(matrix_df[which(rownames(matrix_df)==22),]), batch_condition, sum)
+tapply(as.numeric(matrix_df[which(rownames(matrix_df)==33284),]), batch_condition, sum)
+
 
 
 
@@ -813,6 +822,30 @@ length(table(proteins_over20_ComBat))
 proteins_over20 %in% proteins_over20_ComBat ## Wurden die Metaproteine, die vorher als Biomarker identifiziert
                                             ## wurden, danach auch identifiziert
 
+tapply(as.numeric(combat_data[which(rownames(combat_data)==2024),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==22),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==33284),]), batch_condition, sum)
+
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(combat_data[which(rownames(combat_data)==124),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==132),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==156),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==1673),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data[which(rownames(combat_data)==1703),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==204),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==366),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==37164),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data[which(rownames(combat_data)==400),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==4293),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data[which(rownames(combat_data)==75),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==803),]), batch_condition, sum)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==9040),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(combat_data[which(rownames(combat_data)==9510),]), batch_condition, sum) ## sehr deutlich
+
+
+
+
+
 
 
 
@@ -829,6 +862,19 @@ length(table(proteins_over20_limma))
 
 proteins_over20 %in% proteins_over20_limma
 
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(limma_data[which(rownames(limma_data)==1078),]), batch_condition, sum)
+tapply(as.numeric(limma_data[which(rownames(limma_data)==1673),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(limma_data[which(rownames(limma_data)==37164),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(limma_data[which(rownames(limma_data)==4293),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(limma_data[which(rownames(limma_data)==627),]), batch_condition, sum)
+tapply(as.numeric(limma_data[which(rownames(limma_data)==803),]), batch_condition, sum) ## deutlich
+tapply(as.numeric(limma_data[which(rownames(limma_data)==9040),]), batch_condition, sum) ## sehr deutlich
+
+
+
+
+
 
 
 
@@ -844,6 +890,29 @@ table(proteins_over20_harmony)
 length(table(proteins_over20_harmony))
 
 proteins_over20 %in% proteins_over20_harmony
+
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1032),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1078),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==132),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1712),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==2403),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==37164),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==4293),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==532),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==688),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==75),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==803),]), batch_condition, sum)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==9040),]), batch_condition, sum) ## sehr deutlich
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==998),]), batch_condition, sum)
+
+
+## wurde bei combat und limma deutlich gefunden:
+r2_harmony[which(names(r2_harmony) == 1673)] ## nur knapp unter der Biomarker Grenze
+
+
+
+
 
 
 
@@ -862,7 +931,8 @@ length(table(proteins_over20_MMUPHin))
 proteins_over20 %in% proteins_over20_MMUPHin
 
 
-
+## Wurde in diseased häufiger gefunden als in control
+tapply(as.numeric(MMUPHin_data$feature_abd_adj[which(rownames(MMUPHin_data$feature_abd_adj)==156),]), batch_condition, sum)
 
 
 
@@ -932,7 +1002,7 @@ plotReducedDim(pca_after_mnn, dimred = "PCA", colour_by = "batch")
 
 shared_metaproteins <- Reduce(intersect, lapply(Study_Counts_Discovery, function(x) x[,1])) ## geteilte Metaproteine
 Subset_List_Discovery_shared <- lapply(Subset_List_Discovery, function(x){
-  x[x[[1]] %in% shared_metaproteins, ] ## nur geteilte Metaproteine behalten
+  x[x[[1]] %in% shared_metaproteins, ] ## nur Zielen der geteilten Metaproteine behalten
 })
 
 
@@ -1023,9 +1093,10 @@ g1_shared <- ggplot(df_shared_before, aes(PC1, PC2, color=batch)) +
   (g2_shared_limma | g2_shared_harmony)
 
 
+g1_shared
 (g2_shared_MMUPHin | g2_shared_combat) /
   (g2_shared_limma | g2_shared_harmony)
-g1_shared
+
 
 
 
