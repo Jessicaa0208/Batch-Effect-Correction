@@ -801,7 +801,7 @@ Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==33284]
 
 ## Wie oft wurden diese Metaproteine gefunden (in control vs. diseased)
 matrix_df[which(rownames(matrix_df)==2024),]
-tapply(as.numeric(matrix_df[which(rownames(matrix_df)==2024),]), batch_condition, sum)
+tapply(as.numeric(matrix_df[which(rownames(matrix_df)==2024),]), batch_condition, mean)
 tapply(as.numeric(matrix_df[which(rownames(matrix_df)==22),]), batch_condition, sum)
 tapply(as.numeric(matrix_df[which(rownames(matrix_df)==33284),]), batch_condition, sum)
 
@@ -827,20 +827,27 @@ tapply(as.numeric(combat_data[which(rownames(combat_data)==22),]), batch_conditi
 tapply(as.numeric(combat_data[which(rownames(combat_data)==33284),]), batch_condition, sum)
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(combat_data[which(rownames(combat_data)==124),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==132),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==156),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==1673),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data[which(rownames(combat_data)==1703),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==204),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==366),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==37164),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data[which(rownames(combat_data)==400),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==4293),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data[which(rownames(combat_data)==75),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==803),]), batch_condition, sum)
-tapply(as.numeric(combat_data[which(rownames(combat_data)==9040),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data[which(rownames(combat_data)==9510),]), batch_condition, sum) ## sehr deutlich
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==124),]), batch_condition, mean)
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==132),]), batch_condition, mean)
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==156),]), batch_condition, mean)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==1673),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==1703),]), batch_condition, mean)
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==204),]), batch_condition, mean)
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==366),]), batch_condition, mean)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==37164),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==400),]), batch_condition, mean)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==4293),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==75),]), batch_condition, mean)
+#tapply(as.numeric(combat_data[which(rownames(combat_data)==803),]), batch_condition, mean)
+tapply(as.numeric(combat_data[which(rownames(combat_data)==9040),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(combat_data[which(rownames(combat_data)==9510),]), batch_condition, mean) ## sehr deutlich
+
+
+
+## Wurde in mehr diseased samples gefunden als in control samples
+tapply(as.numeric(combat_data[which(rownames(combat_data)==9510),]!=0), batch_condition, sum) ## alle
+
+
 
 
 
@@ -863,14 +870,17 @@ length(table(proteins_over20_limma))
 proteins_over20 %in% proteins_over20_limma
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(limma_data[which(rownames(limma_data)==1078),]), batch_condition, sum)
-tapply(as.numeric(limma_data[which(rownames(limma_data)==1673),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(limma_data[which(rownames(limma_data)==37164),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(limma_data[which(rownames(limma_data)==4293),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(limma_data[which(rownames(limma_data)==627),]), batch_condition, sum)
-tapply(as.numeric(limma_data[which(rownames(limma_data)==803),]), batch_condition, sum) ## deutlich
-tapply(as.numeric(limma_data[which(rownames(limma_data)==9040),]), batch_condition, sum) ## sehr deutlich
+#tapply(as.numeric(limma_data[which(rownames(limma_data)==1078),]), batch_condition, mean)
+tapply(as.numeric(limma_data[which(rownames(limma_data)==1673),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(limma_data[which(rownames(limma_data)==37164),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(limma_data[which(rownames(limma_data)==4293),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(limma_data[which(rownames(limma_data)==627),]), batch_condition, mean)
+#tapply(as.numeric(limma_data[which(rownames(limma_data)==803),]), batch_condition, mean) ## deutlich
+tapply(as.numeric(limma_data[which(rownames(limma_data)==9040),]), batch_condition, mean) ## sehr deutlich
 
+
+## Wurde in mehr diseased samples gefunden als in control samples
+tapply(as.numeric(limma_data[which(rownames(limma_data)==9040),]!=0), batch_condition, sum) ##alle
 
 
 
@@ -892,23 +902,27 @@ length(table(proteins_over20_harmony))
 proteins_over20 %in% proteins_over20_harmony
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1032),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1078),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==132),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1712),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==2403),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==37164),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==4293),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==532),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==688),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==75),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==803),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==9040),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==998),]), batch_condition, sum)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1032),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1078),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==132),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==1712),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==2403),]), batch_condition, mean)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==37164),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==4293),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==532),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==688),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==75),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==803),]), batch_condition, mean)
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==9040),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==998),]), batch_condition, mean)
 
 
 ## wurde bei combat und limma deutlich gefunden:
 r2_harmony[which(names(r2_harmony) == 1673)] ## nur knapp unter der Biomarker Grenze
+
+
+## Wurde in mehr diseased samples gefunden als in control samples
+tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==998),]!=0), batch_condition, sum) ## alle
 
 
 
@@ -932,10 +946,21 @@ proteins_over20 %in% proteins_over20_MMUPHin
 
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(MMUPHin_data$feature_abd_adj[which(rownames(MMUPHin_data$feature_abd_adj)==156),]), batch_condition, sum)
+#tapply(as.numeric(MMUPHin_data$feature_abd_adj[which(rownames(MMUPHin_data$feature_abd_adj)==156),]), batch_condition, mean)
+
+## Wurde in mehr diseased samples gefunden als in control samples
+tapply(as.numeric(MMUPHin_data$feature_abd_adj[which(rownames(MMUPHin_data$feature_abd_adj)==156),]!=0), batch_condition, sum)
+tapply(as.numeric(MMUPHin_data$feature_abd_adj[which(rownames(MMUPHin_data$feature_abd_adj)==998),]!=0), batch_condition, sum)
+## alle außer 33284 und 627
 
 
 
+biomarker <- list(ComBat = c(1673, 4293, 9040, 9510, 37164), limma = c(1673, 4293, 9040, 37164),
+                  harmony = c(4293, 9040, 37164))
+
+venn.diagram(biomarker, category.names = names(biomarker),
+             filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
+             fill = c("cadetblue", "khaki1", "indianred"))
 
 
 
@@ -1051,7 +1076,7 @@ pca_shared_after_combat  <- prcomp(t(combat_data_shared))
 
 df_shared_after_combat <- data.frame(pca_shared_after_combat$x[,1:2], batch=batch)
 g2_shared_combat <- ggplot(df_shared_after_combat, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach ComBat")
+  geom_point() + ggtitle("Nach ComBat (shared)")
 
 
 
@@ -1059,7 +1084,7 @@ pca_shared_after_limma  <- prcomp(t(limma_data_shared))
 
 df_shared_after_limma <- data.frame(pca_shared_after_limma$x[,1:2], batch=batch)
 g2_shared_limma <- ggplot(df_shared_after_limma, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach limma")
+  geom_point() + ggtitle("Nach limma (shared)")
 
 
 
@@ -1069,7 +1094,7 @@ pca_shared_after_harmony  <- prcomp(harmony_data_shared) ## prcomp erwartet Samp
 
 df_shared_after_harmony <- data.frame(pca_shared_after_harmony$x[,1:2], condition=batch)
 g2_shared_harmony <- ggplot(df_shared_after_harmony, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach harmony")
+  geom_point() + ggtitle("Nach harmony (shared)")
 
 
 
@@ -1079,12 +1104,12 @@ pca_shared_after_MMUPHin <- prcomp(t(MMUPHin_data_shared$feature_abd_adj))
 
 df_shared_after_MMUPHin <- data.frame(pca_shared_after_MMUPHin$x[,1:2], condition=batch)
 g2_shared_MMUPHin <- ggplot(df_shared_after_MMUPHin, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach MMUPHin")
+  geom_point() + ggtitle("Nach MMUPHin (shared)")
 
 
 df_shared_before <- data.frame(pca_shared_before$x[,1:2], batch=batch)
 g1_shared <- ggplot(df_shared_before, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor Korrektur")
+  geom_point() + ggtitle("Vor Korrektur (shared)")
 
 
 
@@ -1272,20 +1297,20 @@ proteins_over20_shared %in% proteins_over20_shared_ComBat ## Wurden die Metaprot
 
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==124),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==132),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==156),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==1673),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==1703),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==204),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==366),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==37164),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==400),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==4293),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==75),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==803),]), batch_condition, sum)
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==9040),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==9510),]), batch_condition, sum) ## sehr deutlich
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==124),]), batch_condition, mean)
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==132),]), batch_condition, mean)
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==156),]), batch_condition, mean)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==1673),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==1703),]), batch_condition, mean)
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==204),]), batch_condition, mean)
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==366),]), batch_condition, mean)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==37164),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==400),]), batch_condition, mean)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==4293),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==75),]), batch_condition, mean)
+#tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==803),]), batch_condition, mean)
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==9040),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==9510),]), batch_condition, mean) ## sehr deutlich
 
 
 
@@ -1310,13 +1335,13 @@ proteins_over20_shared %in% proteins_over20_shared_limma
 
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==1078),]), batch_condition, sum)
-tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==1673),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==37164),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==4293),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==627),]), batch_condition, sum)
-tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==803),]), batch_condition, sum) ## deutlich
-tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==9040),]), batch_condition, sum) ## sehr deutlich
+#tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==1078),]), batch_condition, mean)
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==1673),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==37164),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==4293),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==627),]), batch_condition, mean)
+#tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==803),]), batch_condition, mean) ## deutlich
+tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==9040),]), batch_condition, mean) ## sehr deutlich
 ## Alle die bei limma als Biomarker gefunden wurden, wurden häufiger in diseased gefunden als in control
 
 
@@ -1341,19 +1366,19 @@ proteins_over20_shared %in% proteins_over20_shared_harmony
 
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1032),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1078),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==132),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1712),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==2403),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==37164),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==4293),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==532),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==688),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==75),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==803),]), batch_condition, sum)
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==9040),]), batch_condition, sum) ## sehr deutlich
-tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==998),]), batch_condition, sum)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1032),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1078),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==132),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==1712),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==2403),]), batch_condition, mean)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==37164),]), batch_condition, mean) ## sehr deutlich
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==4293),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==532),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==688),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==75),]), batch_condition, mean)
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==803),]), batch_condition, mean)
+tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==9040),]), batch_condition, mean) ## sehr deutlich
+#tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))==998),]), batch_condition, mean)
 
 
 
@@ -1378,7 +1403,7 @@ proteins_over20_shared %in% proteins_over20_shared_MMUPHin
 
 
 ## Wurde in diseased häufiger gefunden als in control
-tapply(as.numeric(MMUPHin_data_shared$feature_abd_adj[which(rownames(MMUPHin_data_shared$feature_abd_adj)==803),]), batch_condition, sum)
+#tapply(as.numeric(MMUPHin_data_shared$feature_abd_adj[which(rownames(MMUPHin_data_shared$feature_abd_adj)==156),]), batch_condition, mean)
 ## Alle die bei MMUPHin als Biomarker gefunden wurden, wurden häufiger in control gefunden als in diseased
 
 
