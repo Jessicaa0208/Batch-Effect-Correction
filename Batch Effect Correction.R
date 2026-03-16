@@ -808,6 +808,13 @@ tapply(as.numeric(matrix_df[which(rownames(matrix_df)==33284),]), batch_conditio
 
 
 
+
+
+
+
+
+
+
 # Erklärte Varianz der Krankheit nach Combat
 r2_ComBat <- apply(combat_data, 1, function(x) {
   model <- lm(x ~ batch_condition)
@@ -850,13 +857,39 @@ tapply(as.numeric(combat_data[which(rownames(combat_data)==9510),]!=0), batch_co
 
 
 
+## PCA plot der Biomarker
+biomarker_combat <- as.numeric(proteins_over20_ComBat) ## oder nur die IBD Biomarker?
+
+study_condition <- sapply(Subset_List_Discovery, function(x) unique(x[, 6])) ## Vektor der angibt, ob das Sample control oder diseased ist
+batch_condition <- study_condition[match(colnames(matrix_df), names(study_condition))]
+matrix_df_biomarker <- matrix_df[which(rownames(matrix_df) %in% biomarker_combat),] ## nur die Biomarker behalten
+combat_data_biomarker <- combat_data[which(rownames(combat_data) %in% biomarker_combat),]
+
+
+pca_biomarker_before <- prcomp(t(matrix_df_biomarker))
+pca_biomarker_after_combat  <- prcomp(t(combat_data_biomarker))
+
+df_biomarker_before <- data.frame(pca_biomarker_before$x[,1:2], condition=batch_condition)
+g1_biomarker_combat <- ggplot(df_biomarker_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor ComBat")
+
+df_biomarker_after_combat <- data.frame(pca_biomarker_after_combat$x[,1:2], condition=batch_condition)
+g2_biomarker_combat <- ggplot(df_biomarker_after_combat, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach ComBat")
+
+g1_biomarker_combat + g2_biomarker_combat
 
 
 
 
 
 
-# Erklärte Varianzder Krankheit nach limma
+
+
+
+
+
+# Erklärte Varianz der Krankheit nach limma
 r2_limma <- apply(limma_data, 1, function(x) {
   model <- lm(x ~ batch_condition)
   summary(model)$r.squared
@@ -881,6 +914,33 @@ tapply(as.numeric(limma_data[which(rownames(limma_data)==9040),]), batch_conditi
 
 ## Wurde in mehr diseased samples gefunden als in control samples
 tapply(as.numeric(limma_data[which(rownames(limma_data)==9040),]!=0), batch_condition, sum) ##alle
+
+
+
+## PCA plot der Biomarker
+biomarker_limma <- as.numeric(proteins_over20_limma)
+
+matrix_df_biomarker_limma <- matrix_df[which(rownames(matrix_df) %in% biomarker_limma),] ## nur die Biomarker behalten
+limma_data_biomarker <- limma_data[which(rownames(limma_data) %in% biomarker_limma),]
+
+
+pca_biomarker_before <- prcomp(t(matrix_df_biomarker_limma))
+pca_biomarker_after_limma  <- prcomp(t(limma_data_biomarker))
+
+df_biomarker_before <- data.frame(pca_biomarker_before$x[,1:2], condition=batch_condition)
+g1_biomarker_limma <- ggplot(df_biomarker_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor limma")
+
+df_biomarker_after_limma <- data.frame(pca_biomarker_after_limma$x[,1:2], condition=batch_condition)
+g2_biomarker_limma <- ggplot(df_biomarker_after_limma, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach limma")
+
+g1_biomarker_limma + g2_biomarker_limma
+
+
+
+
+
 
 
 
@@ -926,6 +986,34 @@ tapply(as.numeric(t(harmony_data)[which(rownames(t(harmony_data))==998),]!=0), b
 
 
 
+## PCA plots der Biomarker
+biomarker_harmony <- as.numeric(proteins_over20_harmony)
+
+matrix_df_biomarker_harmony <- matrix_df[which(rownames(matrix_df) %in% biomarker_harmony),] ## nur die Biomarker behalten
+harmony_data_biomarker <- harmony_data[, which(colnames(harmony_data) %in% biomarker_harmony)]
+
+
+pca_biomarker_before <- prcomp(t(matrix_df_biomarker_harmony))
+pca_biomarker_after_harmony  <- prcomp(harmony_data_biomarker)
+
+df_biomarker_before <- data.frame(pca_biomarker_before$x[,1:2], condition=batch_condition)
+g1_biomarker_harmony <- ggplot(df_biomarker_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor harmony")
+
+df_biomarker_after_harmony <- data.frame(pca_biomarker_after_harmony$x[,1:2], condition=batch_condition)
+g2_biomarker_harmony <- ggplot(df_biomarker_after_harmony, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach harmony")
+
+g1_biomarker_harmony + g2_biomarker_harmony
+
+
+
+
+
+
+
+
+
 
 
 
@@ -955,12 +1043,39 @@ tapply(as.numeric(MMUPHin_data$feature_abd_adj[which(rownames(MMUPHin_data$featu
 
 
 
-biomarker <- list(ComBat = c(1673, 4293, 9040, 9510, 37164), limma = c(1673, 4293, 9040, 37164),
-                  harmony = c(4293, 9040, 37164))
+## PCA plots der Biomarker
+biomarker_MMUPHin <- as.numeric(proteins_over20_MMUPHin)
+
+matrix_df_biomarker_MMUPHin <- matrix_df[which(rownames(matrix_df) %in% biomarker_MMUPHin),] ## nur die Biomarker behalten
+MMUPHin_data_biomarker <- MMUPHin_data$feature_abd_adj[which(rownames(MMUPHin_data$feature_abd_adj) %in% biomarker_MMUPHin),]
+
+
+pca_biomarker_before <- prcomp(t(matrix_df_biomarker_MMUPHin))
+pca_biomarker_after_MMUPHin  <- prcomp(t(MMUPHin_data_biomarker))
+
+df_biomarker_before <- data.frame(pca_biomarker_before$x[,1:2], condition=batch_condition)
+g1_biomarker_MMUPHin <- ggplot(df_biomarker_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor MMUPHin")
+
+df_biomarker_after_MMUPHin <- data.frame(pca_biomarker_after_MMUPHin$x[,1:2], condition=batch_condition)
+g2_biomarker_MMUPHin <- ggplot(df_biomarker_after_MMUPHin, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach MMUPHin")
+
+g1_biomarker_MMUPHin + g2_biomarker_MMUPHin
+
+
+
+
+
+
+
+
+biomarker <- list(ComBat = as.numeric(proteins_over20_ComBat), limma = as.numeric(proteins_over20_limma),
+                  harmony = as.numeric(proteins_over20_harmony), MMUPHin = as.numeric(proteins_over20_MMUPHin))
 
 venn.diagram(biomarker, category.names = names(biomarker),
              filename = NULL, alpha = 0.5, cat.cex = 1.2, cex = 1.2,
-             fill = c("cadetblue", "khaki1", "indianred"))
+             fill = c("cadetblue","olivedrab3", "khaki1", "indianred"))
 
 
 
@@ -1027,7 +1142,7 @@ plotReducedDim(pca_after_mnn, dimred = "PCA", colour_by = "batch")
 
 shared_metaproteins <- Reduce(intersect, lapply(Study_Counts_Discovery, function(x) x[,1])) ## geteilte Metaproteine
 Subset_List_Discovery_shared <- lapply(Subset_List_Discovery, function(x){
-  x[x[[1]] %in% shared_metaproteins, ] ## nur Zielen der geteilten Metaproteine behalten
+  x[x[[1]] %in% shared_metaproteins, ] ## nur Zeilen der geteilten Metaproteine behalten
 })
 
 
@@ -1316,11 +1431,40 @@ tapply(as.numeric(combat_data_shared[which(rownames(combat_data_shared)==9510),]
 
 
 
+## PCA plot der Biomarker
+biomarker_combat_shared <- as.numeric(proteins_over20_shared_ComBat) 
+
+study_condition <- sapply(Subset_List_Discovery, function(x) unique(x[, 6])) ## Vektor der angibt, ob das Sample control oder diseased ist
+batch_condition <- study_condition[match(colnames(matrix_df), names(study_condition))]
+matrix_df_biomarker_shared <- matrix_df_shared[which(rownames(matrix_df_shared) %in% biomarker_combat_shared),] ## nur die Biomarker behalten
+combat_data_biomarker_shared <- combat_data_shared[which(rownames(combat_data_shared) %in% biomarker_combat_shared),]
+
+
+pca_biomarker_before_shared <- prcomp(t(matrix_df_biomarker_shared))
+pca_biomarker_after_combat_shared  <- prcomp(t(combat_data_biomarker_shared))
+
+df_biomarker_before_shared <- data.frame(pca_biomarker_before_shared$x[,1:2], condition=batch_condition)
+g1_biomarker_combat_shared <- ggplot(df_biomarker_before_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor ComBat (shared)")
+
+df_biomarker_after_combat_shared <- data.frame(pca_biomarker_after_combat_shared$x[,1:2], condition=batch_condition)
+g2_biomarker_combat_shared <- ggplot(df_biomarker_after_combat_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach ComBat (shared)")
+
+g1_biomarker_combat_shared + g2_biomarker_combat_shared
 
 
 
 
-# Erklärte Varianzder Krankheit nach limma
+
+
+
+
+
+
+
+
+# Erklärte Varianz der Krankheit nach limma
 r2_shared_limma <- apply(limma_data_shared, 1, function(x) {
   model <- lm(x ~ batch_condition)
   summary(model)$r.squared
@@ -1343,6 +1487,35 @@ tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==4293),]),
 #tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==803),]), batch_condition, mean) ## deutlich
 tapply(as.numeric(limma_data_shared[which(rownames(limma_data_shared)==9040),]), batch_condition, mean) ## sehr deutlich
 ## Alle die bei limma als Biomarker gefunden wurden, wurden häufiger in diseased gefunden als in control
+
+
+
+
+## PCA plot der Biomarker
+biomarker_limma_shared <- as.numeric(proteins_over20_shared_limma) 
+
+matrix_df_biomarker_shared <- matrix_df_shared[which(rownames(matrix_df_shared) %in% biomarker_limma_shared),] ## nur die Biomarker behalten
+limma_data_biomarker_shared <- limma_data_shared[which(rownames(limma_data_shared) %in% biomarker_limma_shared),]
+
+
+pca_biomarker_before_shared <- prcomp(t(matrix_df_biomarker_shared))
+pca_biomarker_after_limma_shared  <- prcomp(t(limma_data_biomarker_shared))
+
+df_biomarker_before_shared <- data.frame(pca_biomarker_before_shared$x[,1:2], condition=batch_condition)
+g1_biomarker_limma_shared <- ggplot(df_biomarker_before_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor limma (shared)")
+
+df_biomarker_after_limma_shared <- data.frame(pca_biomarker_after_limma_shared$x[,1:2], condition=batch_condition)
+g2_biomarker_limma_shared <- ggplot(df_biomarker_after_limma_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach limma (shared)")
+
+g1_biomarker_limma_shared + g2_biomarker_limma_shared
+
+
+
+
+
+
 
 
 
@@ -1385,6 +1558,35 @@ tapply(as.numeric(t(harmony_data_shared)[which(rownames(t(harmony_data_shared))=
 
 
 
+## PCA plot der Biomarker
+biomarker_harmony_shared <- as.numeric(proteins_over20_shared_harmony) 
+
+matrix_df_biomarker_shared <- matrix_df_shared[which(rownames(matrix_df_shared) %in% biomarker_harmony_shared),] ## nur die Biomarker behalten
+harmony_data_biomarker_shared <- harmony_data_shared[, which(colnames(harmony_data_shared) %in% biomarker_harmony_shared)]
+
+
+pca_biomarker_before_shared <- prcomp(t(matrix_df_biomarker_shared))
+pca_biomarker_after_harmony_shared  <- prcomp(harmony_data_biomarker_shared)
+
+df_biomarker_before_shared <- data.frame(pca_biomarker_before_shared$x[,1:2], condition=batch_condition)
+g1_biomarker_harmony_shared <- ggplot(df_biomarker_before_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor harmony (shared)")
+
+df_biomarker_after_harmony_shared <- data.frame(pca_biomarker_after_harmony_shared$x[,1:2], condition=batch_condition)
+g2_biomarker_harmony_shared <- ggplot(df_biomarker_after_harmony_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach harmony (shared)")
+
+g1_biomarker_harmony_shared + g2_biomarker_harmony_shared
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1405,6 +1607,32 @@ proteins_over20_shared %in% proteins_over20_shared_MMUPHin
 ## Wurde in diseased häufiger gefunden als in control
 #tapply(as.numeric(MMUPHin_data_shared$feature_abd_adj[which(rownames(MMUPHin_data_shared$feature_abd_adj)==156),]), batch_condition, mean)
 ## Alle die bei MMUPHin als Biomarker gefunden wurden, wurden häufiger in control gefunden als in diseased
+
+
+
+
+## PCA plot der Biomarker
+biomarker_MMUPHin_shared <- as.numeric(proteins_over20_shared_MMUPHin) 
+
+matrix_df_biomarker_shared <- matrix_df_shared[which(rownames(matrix_df_shared) %in% biomarker_MMUPHin_shared),] ## nur die Biomarker behalten
+MMUPHin_data_biomarker_shared <- MMUPHin_data_shared$feature_abd_adj[which(rownames(MMUPHin_data_shared$feature_abd_adj) %in% biomarker_MMUPHin_shared),]
+
+
+pca_biomarker_before_shared <- prcomp(t(matrix_df_biomarker_shared))
+pca_biomarker_after_MMUPHin_shared  <- prcomp(t(MMUPHin_data_biomarker_shared))
+
+df_biomarker_before_shared <- data.frame(pca_biomarker_before_shared$x[,1:2], condition=batch_condition)
+g1_biomarker_MMUPHin_shared <- ggplot(df_biomarker_before_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker vor MMUPHin (shared)")
+
+df_biomarker_after_MMUPHin_shared <- data.frame(pca_biomarker_after_MMUPHin_shared$x[,1:2], condition=batch_condition)
+g2_biomarker_MMUPHin_shared <- ggplot(df_biomarker_after_MMUPHin_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Biomarker nach MMUPHin (shared)")
+
+g1_biomarker_MMUPHin_shared + g2_biomarker_MMUPHin_shared
+
+
+
 
 
 
