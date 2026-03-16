@@ -1244,6 +1244,97 @@ g1_shared
 
 
 
+# Condition
+
+study_condition_shared <- sapply(Subset_List_Discovery_shared, function(x) unique(x[, 6])) ## Vektor der angibt, ob das Sample control oder diseased ist
+
+batch_condition_shared <- study_condition_shared[match(colnames(matrix_df), names(study_condition_shared))]
+
+## ComBat
+pca_before_shared <- prcomp(t(matrix_df_shared))
+pca_after_combat_shared  <- prcomp(t(combat_data_shared))
+
+df_condition_before_shared <- data.frame(pca_before_shared$x[,1:2], condition=batch_condition_shared)
+g1_condition_combat_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Vor ComBat (shared)")
+
+df_condition_after_combat_shared <- data.frame(pca_after_combat_shared$x[,1:2], condition=batch_condition_shared)
+g2_condition_combat_shared <- ggplot(df_condition_after_combat_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Nach ComBat (shared)")
+
+g1_condition_combat_shared + g2_condition_combat_shared
+
+
+
+## limma
+pca_before_shared <- prcomp(t(matrix_df_shared))
+pca_after_limma_shared  <- prcomp(t(limma_data_shared))
+
+df_condition_before_shared <- data.frame(pca_before_shared$x[,1:2], condition=batch_condition_shared)
+g1_condition_limma_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Vor limma (shared)")
+
+df_condition_after_limma_shared <- data.frame(pca_after_limma_shared$x[,1:2], condition=batch_condition_shared)
+g2_condition_limma_shared <- ggplot(df_condition_after_limma_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Nach limma (shared)")
+
+g1_condition_limma_shared + g2_condition_limma_shared
+
+
+
+
+## harmony
+pca_before_shared <- prcomp(t(matrix_df_shared))
+pca_after_harmony_shared  <- prcomp(harmony_data_shared)
+
+df_condition_before_shared <- data.frame(pca_before_shared$x[,1:2], condition=batch_condition_shared)
+g1_condition_harmony_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Vor harmony (shared)")
+
+df_condition_after_harmony_shared <- data.frame(pca_after_harmony_shared$x[,1:2], condition=batch_condition_shared)
+g2_condition_harmony_shared <- ggplot(df_condition_after_harmony_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Nach harmony (shared)")
+
+g1_condition_harmony_shared + g2_condition_harmony_shared
+
+
+
+
+## MMUPHin
+pca_before_shared <- prcomp(t(matrix_df_shared))
+pca_after_MMUPHin_shared  <- prcomp(t(MMUPHin_data_shared$feature_abd_adj))
+
+df_condition_before_shared <- data.frame(pca_before_shared$x[,1:2], condition=batch_condition_shared)
+g1_condition_MMUPHin_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Vor MMUPHin (shared)")
+
+df_condition_after_MMUPHin_shared <- data.frame(pca_after_MMUPHin_shared$x[,1:2], condition=batch_condition_shared)
+g2_condition_MMUPHin_shared <- ggplot(df_condition_after_MMUPHin_shared, aes(PC1, PC2, color=batch_condition_shared)) +
+  geom_point() + ggtitle("Nach MMUPHin (shared)")
+
+g1_condition_MMUPHin_shared + g2_condition_MMUPHin_shared
+
+
+
+
+
+(g2_condition_MMUPHin_shared | g2_condition_combat_shared) /
+  (g2_condition_limma_shared | g2_condition_harmony_shared)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Quantifizierung
 
 # Silhouette Score
@@ -1306,6 +1397,7 @@ mean(sil_shared_after_MMUPHin[, "sil_width"])
 
 
 
+
 # kBET
 library(kBET)
 set.seed(2)
@@ -1324,6 +1416,7 @@ k_bet_shared_harmony$summary
 
 k_bet_shared_MMUPHin <- kBET(MMUPHin_data_shared$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_MMUPHin$summary
+
 
 
 
@@ -1361,6 +1454,8 @@ print(fit_adonis_shared_condition_after_ComBat)
 print(fit_adonis_shared_condition_after_limma)
 print(fit_adonis_shared_condition_after_harmony)
 print(fit_adonis_shared_condition_after_MMUPHin)
+
+
 
 
 
