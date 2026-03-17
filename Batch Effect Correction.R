@@ -311,6 +311,7 @@ combat_data <- ComBat(as.matrix(matrix_df), batch = batch, mod = NULL, par.prior
 # Normalisierter dataframe
 csum <- as.numeric(colSums(matrix_df))
 matrix_df_norm <- matrix_df / rep(csum, each = nrow(matrix_df))
+
 combat_data_norm <- ComBat(as.matrix(matrix_df_norm), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
 
 
@@ -328,6 +329,22 @@ g2_combat <- ggplot(df_after_combat, aes(PC1, PC2, color=batch)) +
   geom_point() + ggtitle("Nach ComBat")
 
 g1_combat + g2_combat
+
+
+
+# Normalisierte Daten
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_combat_norm  <- prcomp(t(combat_data_norm))
+
+df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
+g1_combat_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor ComBat (normalisiert)")
+
+df_after_combat_norm <- data.frame(pca_after_combat_norm$x[,1:2], batch=batch)
+g2_combat_norm <- ggplot(df_after_combat_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach ComBat (normalisiert)")
+
+g1_combat_norm + g2_combat_norm
 
 
 
@@ -417,6 +434,24 @@ g1_limma + g2_limma
 
 
 
+# Normalisierte Daten
+limma_data_norm <- removeBatchEffect(as.matrix(matrix_df_norm), batch = batch)
+
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_limma_norm  <- prcomp(t(limma_data_norm))
+
+df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
+g1_limma_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor limma (normalisiert)")
+
+df_after_limma_norm <- data.frame(pca_after_limma_norm$x[,1:2], batch=batch)
+g2_limma_norm <- ggplot(df_after_limma_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach limma (normalisiert)")
+
+g1_limma_norm + g2_limma_norm
+
+
+
 
 
 
@@ -490,6 +525,23 @@ g1 <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
 
 
 
+
+
+## Normalisierte Daten
+harmony_data_norm <- RunHarmony(data_mat = as.matrix(t(matrix_df_norm)), meta_data = batch, vars_use = "batch")
+
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_harmony_norm  <- prcomp(harmony_data_norm)
+
+df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
+g1_harmony_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor harmony (normalisiert)")
+
+df_after_harmony_norm <- data.frame(pca_after_harmony_norm$x[,1:2], batch=batch)
+g2_harmony_norm <- ggplot(df_after_harmony_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach harmony (normalisiert)")
+
+g1_harmony_norm + g2_harmony_norm
 
 
 
@@ -579,6 +631,35 @@ g1_MMUPHin + g2_MMUPHin
 g1
 (g2_MMUPHin | g2_combat) /
   (g2_limma | g2_harmony)
+
+
+
+
+## Normalisierte Daten
+MMUPHin_data_norm <- adjust_batch(feature_abd = matrix_df_norm, batch = "study", data = Sup_File_Discovery)
+
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_MMUPHin_norm  <- prcomp(t(MMUPHin_data_norm$feature_abd_adj))
+
+df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
+g1_MMUPHin_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor MMUPHin (normalisiert)")
+
+df_after_MMUPHin_norm <- data.frame(pca_after_MMUPHin_norm$x[,1:2], batch=batch)
+g2_MMUPHin_norm <- ggplot(df_after_MMUPHin_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach MMUPHin (normalisiert)")
+
+g1_MMUPHin_norm + g2_MMUPHin_norm
+
+
+g1_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor Korrektur")
+
+
+(g2_MMUPHin_norm | g2_combat_norm) /
+  (g2_limma_norm | g2_harmony_norm)
+g1_norm
+
 
 
 
@@ -698,6 +779,64 @@ mean(sil_condition_after_limma[, "sil_width"])
 
 
 
+# Normalisierte Daten
+## before
+coords_before_norm <- pca_before_norm$x
+
+dist_matrix_before_norm <- dist(coords_before_norm)
+
+sil_before_norm <- silhouette(as.numeric(batch_labels), dist_matrix_before_norm)
+
+
+## after combat
+coords_after_combat_norm <- pca_after_combat_norm$x
+
+dist_matrix_after_combat_norm <- dist(coords_after_combat_norm)
+
+sil_after_combat_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_combat_norm)
+
+
+
+## after limma
+coords_after_limma_norm <- pca_after_limma_norm$x
+
+dist_matrix_after_limma_norm <- dist(coords_after_limma_norm)
+
+sil_after_limma_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_limma_norm)
+
+
+
+## after harmony
+coords_after_harmony_norm <- pca_after_harmony_norm$x
+
+dist_matrix_after_harmony_norm <- dist(coords_after_harmony_norm)
+
+sil_after_harmony_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_harmony_norm)
+
+
+
+## after MMUPHin
+coords_after_MMUPHin_norm <- pca_after_MMUPHin_norm$x
+
+dist_matrix_after_MMUPHin_norm <- dist(coords_after_MMUPHin_norm)
+
+sil_after_MMUPHin_norm <- silhouette(as.numeric(batch_labels), dist_matrix_after_MMUPHin_norm)
+
+
+## Vergleich average Silhouetten Score before und after
+mean(sil_before_norm[, "sil_width"])
+mean(sil_after_combat_norm[, "sil_width"])
+mean(sil_after_limma_norm[, "sil_width"])
+mean(sil_after_harmony_norm[, "sil_width"])
+mean(sil_after_MMUPHin_norm[, "sil_width"])
+
+
+
+
+
+
+
+
 
 
 
@@ -722,6 +861,25 @@ k_bet_harmony$summary
 
 k_bet_MMUPHin <- kBET(MMUPHin_data$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_MMUPHin$summary
+
+
+
+
+# Normalisierte Daten
+k_bet_norm <- kBET(as.matrix(matrix_df_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_norm$summary
+
+k_bet_combat_norm <- kBET(combat_data_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_combat_norm$summary
+
+k_bet_limma_norm <- kBET(limma_data_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_limma_norm$summary
+
+k_bet_harmony_norm <- kBET(harmony_data_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_harmony_norm$summary
+
+k_bet_MMUPHin_norm <- kBET(MMUPHin_data_norm$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_MMUPHin_norm$summary
 
 
 
@@ -1087,32 +1245,92 @@ venn.diagram(biomarker, category.names = names(biomarker),
 
 
 
+# Normalisierte Daten
+
+# Erklärte Varianz der Krankheit vor der batch Korrektur
+r2_norm <- apply(matrix_df_norm, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_norm <- names(r2_norm)[r2_norm > 0.20]
+proteins_over20_norm <- proteins_over20_norm[!is.na(proteins_over20_norm)] ## NAs entfernen
+table(proteins_over20_norm)
+
+
+
+
+# Erklärte Varianz der Krankheit nach Combat
+r2_ComBat_norm <- apply(combat_data_norm, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_ComBat_norm <- names(r2_ComBat_norm)[r2_ComBat_norm > 0.2]
+proteins_over20_ComBat_norm <- proteins_over20_ComBat_norm[!is.na(proteins_over20_ComBat_norm)]
+table(proteins_over20_ComBat_norm)
+length(table(proteins_over20_ComBat_norm))
+
+tapply(as.numeric(combat_data_norm[which(rownames(combat_data_norm)==37164),]), batch_condition, mean)
 
 
 
 
 
-# Paket batchelor ---------------------------------------------------------
+# Erklärte Varianz der Krankheit nach limma
+r2_limma_norm <- apply(limma_data_norm, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
 
-BiocManager::install("batchelor")
-BiocManager::install("scater")
-library(batchelor)
-library(scater)
+proteins_over20_limma_norm <- names(r2_limma_norm)[r2_limma_norm > 0.2]
+proteins_over20_limma_norm <- proteins_over20_limma_norm[!is.na(proteins_over20_limma_norm)]
+table(proteins_over20_limma_norm)
+length(table(proteins_over20_limma_norm))
 
-## Gefordetes Datenformat: Zeilen = Metaproteine, Spalten = Sample, Liste von Matrizen (jede Matrix ein Batch)
+tapply(as.numeric(limma_data_norm[which(rownames(limma_data_norm)==37164),]), batch_condition, mean)
 
-batches <- lapply(split(seq_along(batch), batch),
-                  function(idx) as.matrix(matrix_df)[, idx])
 
-mnn_data <- fastMNN(batches) 
 
-mnn_data_df <- t(as.data.frame(reducedDim(mnn_data, "corrected")))
 
-mnn_data_tsne <- runTSNE(mnn_data, dimred = "corrected")
-plotTSNE(mnn_data_tsne, colour_by = "batch")
 
-pca_after_mnn <- runPCA(mnn_data, dimred = "corrected")
-plotReducedDim(pca_after_mnn, dimred = "PCA", colour_by = "batch")
+# Erklärte Varianz der Krankheit nach harmony
+r2_harmony_norm <- apply(t(harmony_data_norm), 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_harmony_norm <- names(r2_harmony_norm)[r2_harmony_norm > 0.2]
+proteins_over20_harmony_norm <- proteins_over20_harmony_norm[!is.na(proteins_over20_harmony_norm)]
+table(proteins_over20_harmony_norm)
+length(table(proteins_over20_harmony_norm))
+
+tapply(as.numeric(t(harmony_data_norm)[which(rownames(t(harmony_data_norm))==37164),]), batch_condition, mean)
+
+
+
+
+
+# Erklärte Varianz der Krankheit nach MMUPHin
+r2_MMUPHin_norm <- apply(MMUPHin_data_norm$feature_abd_adj, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_MMUPHin_norm <- names(r2_MMUPHin_norm)[r2_MMUPHin_norm > 0.2]
+proteins_over20_MMUPHin_norm <- proteins_over20_MMUPHin_norm[!is.na(proteins_over20_MMUPHin_norm)]
+table(proteins_over20_MMUPHin_norm)
+length(table(proteins_over20_MMUPHin_norm))
+
+tapply(as.numeric(MMUPHin_data_norm$feature_abd_adj[which(rownames(MMUPHin_data_norm$feature_abd_adj)==37164),]), batch_condition, mean)
+
+
+
+
+
+
+
+
 
 
 
@@ -1725,6 +1943,11 @@ g2_biomarker_MMUPHin_shared <- ggplot(df_biomarker_after_MMUPHin_shared, aes(PC1
   geom_point() + ggtitle("Biomarker nach MMUPHin (shared)")
 
 g1_biomarker_MMUPHin_shared + g2_biomarker_MMUPHin_shared
+
+
+
+(g2_biomarker_combat_shared + g2_biomarker_limma_shared)/
+  (g2_biomarker_harmony_shared + g2_biomarker_MMUPHin_shared)
 
 
 
