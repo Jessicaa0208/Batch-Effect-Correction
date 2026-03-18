@@ -653,7 +653,7 @@ g1_MMUPHin_norm + g2_MMUPHin_norm
 
 
 g1_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor Korrektur")
+  geom_point() + ggtitle("Vor Korrektur (normalisiert)")
 
 
 (g2_MMUPHin_norm | g2_combat_norm) /
@@ -922,6 +922,39 @@ print(fit_adonis_condition_after_limma)
 print(fit_adonis_condition_after_harmony)
 print(fit_adonis_condition_after_MMUPHin)
 
+
+
+
+
+# Normalisierte Daten
+
+## Erklärte Varianz durch die Studien
+set.seed(2)
+fit_adonis_before_norm <- adonis2(dist_matrix_before_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_ComBat_norm <- adonis2(dist_matrix_after_combat_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_limma_norm <- adonis2(dist_matrix_after_limma_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_harmony_norm <- adonis2(dist_matrix_after_harmony_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_after_MMUPHin_norm <- adonis2(dist_matrix_after_MMUPHin_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_before_norm) 
+print(fit_adonis_after_ComBat_norm)
+print(fit_adonis_after_limma_norm)
+print(fit_adonis_after_harmony_norm)
+print(fit_adonis_after_MMUPHin_norm)
+
+
+
+## Erklärte Varianz durch die Krankheit
+set.seed(2)
+fit_adonis_condition_before_norm <- adonis2(dist_matrix_before_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_ComBat_norm <- adonis2(dist_matrix_after_combat_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_limma_norm <- adonis2(dist_matrix_after_limma_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_harmony_norm <- adonis2(dist_matrix_after_harmony_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_condition_after_MMUPHin_norm <- adonis2(dist_matrix_after_MMUPHin_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_condition_before_norm)
+print(fit_adonis_condition_after_ComBat_norm)
+print(fit_adonis_condition_after_limma_norm)
+print(fit_adonis_condition_after_harmony_norm)
+print(fit_adonis_condition_after_MMUPHin_norm)
 
 
 
@@ -1223,6 +1256,11 @@ g1_biomarker_MMUPHin + g2_biomarker_MMUPHin
 
 
 
+(g2_biomarker_MMUPHin + g2_biomarker_combat)/
+  (g2_biomarker_limma + g2_biomarker_harmony)
+
+
+
 
 
 
@@ -1256,6 +1294,7 @@ r2_norm <- apply(matrix_df_norm, 1, function(x) {
 proteins_over20_norm <- names(r2_norm)[r2_norm > 0.20]
 proteins_over20_norm <- proteins_over20_norm[!is.na(proteins_over20_norm)] ## NAs entfernen
 table(proteins_over20_norm)
+length(table(proteins_over20_norm))
 
 
 
@@ -1272,6 +1311,7 @@ table(proteins_over20_ComBat_norm)
 length(table(proteins_over20_ComBat_norm))
 
 tapply(as.numeric(combat_data_norm[which(rownames(combat_data_norm)==37164),]), batch_condition, mean)
+
 
 
 
@@ -1305,7 +1345,7 @@ proteins_over20_harmony_norm <- proteins_over20_harmony_norm[!is.na(proteins_ove
 table(proteins_over20_harmony_norm)
 length(table(proteins_over20_harmony_norm))
 
-tapply(as.numeric(t(harmony_data_norm)[which(rownames(t(harmony_data_norm))==37164),]), batch_condition, mean)
+tapply(as.numeric(t(harmony_data_norm)[which(rownames(t(harmony_data_norm))==1673),]), batch_condition, mean)
 
 
 
@@ -1322,7 +1362,7 @@ proteins_over20_MMUPHin_norm <- proteins_over20_MMUPHin_norm[!is.na(proteins_ove
 table(proteins_over20_MMUPHin_norm)
 length(table(proteins_over20_MMUPHin_norm))
 
-tapply(as.numeric(MMUPHin_data_norm$feature_abd_adj[which(rownames(MMUPHin_data_norm$feature_abd_adj)==37164),]), batch_condition, mean)
+tapply(as.numeric(MMUPHin_data_norm$feature_abd_adj[which(rownames(MMUPHin_data_norm$feature_abd_adj)==2347),]), batch_condition, mean)
 
 
 
@@ -1538,6 +1578,77 @@ g1_condition_MMUPHin_shared + g2_condition_MMUPHin_shared
 
 (g2_condition_MMUPHin_shared | g2_condition_combat_shared) /
   (g2_condition_limma_shared | g2_condition_harmony_shared)
+
+
+
+
+
+
+
+
+
+
+
+
+# Normalisierte Daten
+
+csum_shared <- as.numeric(colSums(matrix_df_shared))
+matrix_df_shared_norm <- matrix_df_shared / rep(csum_shared, each = nrow(matrix_df_shared))
+
+## ComBat
+combat_data_shared_norm <- ComBat(as.matrix(matrix_df_shared_norm), batch = batch, mod = NULL, par.prior = TRUE, prior.plots = FALSE)
+
+## limma
+limma_data_shared_norm <- removeBatchEffect(as.matrix(matrix_df_shared_norm), batch = batch)
+
+## harmony
+harmony_data_shared_norm <- RunHarmony(data_mat = as.matrix(t(matrix_df_shared_norm)), meta_data = batch, vars_use = "batch")
+
+## MMUPHin
+MMUPHin_data_shared_norm <- adjust_batch(feature_abd = matrix_df_shared_norm, batch = "study", data = Sup_File_Discovery)
+
+
+
+## ComBat
+pca_before_shared_norm <- prcomp(t(matrix_df_shared_norm))
+pca_after_combat_shared_norm  <- prcomp(t(combat_data_shared_norm))
+
+df_before_shared_norm <- data.frame(pca_before_shared_norm$x[,1:2], condition=batch)
+g1_shared_norm <- ggplot(df_before_shared_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor Korrektur (shared, normalisiert)")
+
+df_after_combat_shared_norm <- data.frame(pca_after_combat_shared_norm$x[,1:2], condition=batch)
+g2_combat_shared_norm <- ggplot(df_after_combat_shared_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach ComBat (shared, normalisiert)")
+
+## limma
+pca_after_limma_shared_norm  <- prcomp(t(limma_data_shared_norm))
+
+df_after_limma_shared_norm <- data.frame(pca_after_limma_shared_norm$x[,1:2], condition=batch)
+g2_limma_shared_norm <- ggplot(df_after_limma_shared_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach limma (shared, normalisiert)")
+
+## harmony
+pca_after_harmony_shared_norm  <- prcomp(harmony_data_shared_norm)
+
+df_after_harmony_shared_norm <- data.frame(pca_after_harmony_shared_norm$x[,1:2], condition=batch)
+g2_harmony_shared_norm <- ggplot(df_after_harmony_shared_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach harmony (shared, normalisiert)")
+
+## MMUPHin
+pca_after_MMUPHin_shared_norm  <- prcomp(t(MMUPHin_data_shared_norm$feature_abd_adj))
+
+df_after_MMUPHin_shared_norm <- data.frame(pca_after_MMUPHin_shared_norm$x[,1:2], condition=batch)
+g2_MMUPHin_shared_norm <- ggplot(df_after_MMUPHin_shared_norm, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Nach MMUPHin (shared, normalisiert)")
+
+
+
+g1_shared_norm
+(g2_MMUPHin_shared_norm | g2_combat_shared_norm) /
+  (g2_limma_shared_norm | g2_harmony_shared_norm)
+
+
 
 
 
@@ -1946,10 +2057,99 @@ g1_biomarker_MMUPHin_shared + g2_biomarker_MMUPHin_shared
 
 
 
-(g2_biomarker_combat_shared + g2_biomarker_limma_shared)/
-  (g2_biomarker_harmony_shared + g2_biomarker_MMUPHin_shared)
+(g2_biomarker_MMUPHin_shared + g2_biomarker_combat_shared)/
+  (g2_biomarker_limma_shared + g2_biomarker_harmony_shared)
 
 
+
+
+
+
+
+
+
+
+
+
+# Normalisierte Daten
+
+# Erklärte Varianz der Krankheit vor der batch Korrektur
+r2_shared_norm <- apply(matrix_df_shared_norm, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_shared_norm <- names(r2_shared_norm)[r2_shared_norm > 0.20]
+proteins_over20_shared_norm <- proteins_over20_shared_norm[!is.na(proteins_over20_shared_norm)] ## NAs entfernen
+table(proteins_over20_shared_norm)
+length(table(proteins_over20_shared_norm))
+
+
+
+
+# Erklärte Varianz der Krankheit nach Combat
+r2_ComBat_shared_norm <- apply(combat_data_shared_norm, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_ComBat_shared_norm <- names(r2_ComBat_shared_norm)[r2_ComBat_shared_norm > 0.2]
+proteins_over20_ComBat_shared_norm <- proteins_over20_ComBat_shared_norm[!is.na(proteins_over20_ComBat_shared_norm)]
+table(proteins_over20_ComBat_shared_norm)
+length(table(proteins_over20_ComBat_shared_norm))
+
+tapply(as.numeric(combat_data_shared_norm[which(rownames(combat_data_shared_norm)==37164),]), batch_condition, mean)
+
+
+
+
+
+# Erklärte Varianz der Krankheit nach limma
+r2_limma_shared_norm <- apply(limma_data_shared_norm, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_limma_shared_norm <- names(r2_limma_shared_norm)[r2_limma_shared_norm > 0.2]
+proteins_over20_limma_shared_norm <- proteins_over20_limma_shared_norm[!is.na(proteins_over20_limma_shared_norm)]
+table(proteins_over20_limma_shared_norm)
+length(table(proteins_over20_limma_shared_norm))
+
+tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)==37164),]), batch_condition, mean)
+
+
+
+
+
+# Erklärte Varianz der Krankheit nach harmony
+r2_harmony_shared_norm <- apply(t(harmony_data_shared_norm), 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_harmony_shared_norm <- names(r2_harmony_shared_norm)[r2_harmony_shared_norm > 0.2]
+proteins_over20_harmony_shared_norm <- proteins_over20_harmony_shared_norm[!is.na(proteins_over20_harmony_shared_norm)]
+table(proteins_over20_harmony_shared_norm)
+length(table(proteins_over20_harmony_shared_norm))
+
+tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shared_norm))==37164),]), batch_condition, mean)
+
+
+
+
+
+# Erklärte Varianz der Krankheit nach MMUPHin
+r2_MMUPHin_shared_norm <- apply(MMUPHin_data_shared_norm$feature_abd_adj, 1, function(x) {
+  model <- lm(x ~ batch_condition)
+  summary(model)$r.squared
+})
+
+proteins_over20_MMUPHin_shared_norm <- names(r2_MMUPHin_shared_norm)[r2_MMUPHin_shared_norm > 0.2]
+proteins_over20_MMUPHin_shared_norm <- proteins_over20_MMUPHin_shared_norm[!is.na(proteins_over20_MMUPHin_shared_norm)]
+table(proteins_over20_MMUPHin_shared_norm)
+length(table(proteins_over20_MMUPHin_shared_norm))
+
+tapply(as.numeric(MMUPHin_data_shared_norm$feature_abd_adj[which(rownames(MMUPHin_data_shared_norm$feature_abd_adj)==2347),]), batch_condition, mean)
 
 
 
