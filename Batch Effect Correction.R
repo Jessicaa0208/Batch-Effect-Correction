@@ -1449,7 +1449,7 @@ pca_shared_after_combat  <- prcomp(t(combat_data_shared))
 
 df_shared_after_combat <- data.frame(pca_shared_after_combat$x[,1:2], batch=batch)
 g2_shared_combat <- ggplot(df_shared_after_combat, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach ComBat (shared)")
+  geom_point() + ggtitle("Nach ComBat")
 
 
 
@@ -1457,7 +1457,7 @@ pca_shared_after_limma  <- prcomp(t(limma_data_shared))
 
 df_shared_after_limma <- data.frame(pca_shared_after_limma$x[,1:2], batch=batch)
 g2_shared_limma <- ggplot(df_shared_after_limma, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach limma (shared)")
+  geom_point() + ggtitle("Nach limma")
 
 
 
@@ -1467,7 +1467,7 @@ pca_shared_after_harmony  <- prcomp(harmony_data_shared) ## prcomp erwartet Samp
 
 df_shared_after_harmony <- data.frame(pca_shared_after_harmony$x[,1:2], condition=batch)
 g2_shared_harmony <- ggplot(df_shared_after_harmony, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach harmony (shared)")
+  geom_point() + ggtitle("Nach harmony")
 
 
 
@@ -1477,12 +1477,12 @@ pca_shared_after_MMUPHin <- prcomp(t(MMUPHin_data_shared$feature_abd_adj))
 
 df_shared_after_MMUPHin <- data.frame(pca_shared_after_MMUPHin$x[,1:2], condition=batch)
 g2_shared_MMUPHin <- ggplot(df_shared_after_MMUPHin, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach MMUPHin (shared)")
+  geom_point() + ggtitle("Nach MMUPHin")
 
 
 df_shared_before <- data.frame(pca_shared_before$x[,1:2], batch=batch)
 g1_shared <- ggplot(df_shared_before, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor Korrektur (shared)")
+  geom_point() + ggtitle("Vor Korrektur")
 
 
 
@@ -1514,11 +1514,11 @@ pca_after_combat_shared  <- prcomp(t(combat_data_shared))
 
 df_condition_before_shared <- data.frame(pca_before_shared$x[,1:2], condition=batch_condition_shared)
 g1_condition_combat_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, color=batch_condition_shared)) +
-  geom_point() + ggtitle("Vor ComBat (shared)")
+  geom_point() + ggtitle("Vor ComBat")
 
 df_condition_after_combat_shared <- data.frame(pca_after_combat_shared$x[,1:2], condition=batch_condition_shared)
 g2_condition_combat_shared <- ggplot(df_condition_after_combat_shared, aes(PC1, PC2, color=batch_condition_shared)) +
-  geom_point() + ggtitle("Nach ComBat (shared)")
+  geom_point() + ggtitle("Nach ComBat")
 
 g1_condition_combat_shared + g2_condition_combat_shared
 
@@ -1534,7 +1534,7 @@ g1_condition_limma_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, co
 
 df_condition_after_limma_shared <- data.frame(pca_after_limma_shared$x[,1:2], condition=batch_condition_shared)
 g2_condition_limma_shared <- ggplot(df_condition_after_limma_shared, aes(PC1, PC2, color=batch_condition_shared)) +
-  geom_point() + ggtitle("Nach limma (shared)")
+  geom_point() + ggtitle("Nach limma")
 
 g1_condition_limma_shared + g2_condition_limma_shared
 
@@ -1551,7 +1551,7 @@ g1_condition_harmony_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, 
 
 df_condition_after_harmony_shared <- data.frame(pca_after_harmony_shared$x[,1:2], condition=batch_condition_shared)
 g2_condition_harmony_shared <- ggplot(df_condition_after_harmony_shared, aes(PC1, PC2, color=batch_condition_shared)) +
-  geom_point() + ggtitle("Nach harmony (shared)")
+  geom_point() + ggtitle("Nach harmony")
 
 g1_condition_harmony_shared + g2_condition_harmony_shared
 
@@ -1568,13 +1568,20 @@ g1_condition_MMUPHin_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, 
 
 df_condition_after_MMUPHin_shared <- data.frame(pca_after_MMUPHin_shared$x[,1:2], condition=batch_condition_shared)
 g2_condition_MMUPHin_shared <- ggplot(df_condition_after_MMUPHin_shared, aes(PC1, PC2, color=batch_condition_shared)) +
-  geom_point() + ggtitle("Nach MMUPHin (shared)")
+  geom_point() + ggtitle("Nach MMUPHin")
 
 g1_condition_MMUPHin_shared + g2_condition_MMUPHin_shared
 
 
 
+df_condition_before_shared <- data.frame(pca_before_shared$x[,1:2], condition=batch_condition)
+g1_condition_shared <- ggplot(df_condition_before_shared, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Vor Korrektur")
 
+
+
+
+g1_shared + g1_condition_shared
 
 (g2_condition_MMUPHin_shared | g2_condition_combat_shared) /
   (g2_condition_limma_shared | g2_condition_harmony_shared)
@@ -1615,32 +1622,32 @@ pca_after_combat_shared_norm  <- prcomp(t(combat_data_shared_norm))
 
 df_before_shared_norm <- data.frame(pca_before_shared_norm$x[,1:2], condition=batch)
 g1_shared_norm <- ggplot(df_before_shared_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor Korrektur (shared, normalisiert)")
+  geom_point() + ggtitle("Nach Normalisierung")
 
 df_after_combat_shared_norm <- data.frame(pca_after_combat_shared_norm$x[,1:2], condition=batch)
 g2_combat_shared_norm <- ggplot(df_after_combat_shared_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach ComBat (shared, normalisiert)")
+  geom_point() + ggtitle("Nach ComBat")
 
 ## limma
 pca_after_limma_shared_norm  <- prcomp(t(limma_data_shared_norm))
 
 df_after_limma_shared_norm <- data.frame(pca_after_limma_shared_norm$x[,1:2], condition=batch)
 g2_limma_shared_norm <- ggplot(df_after_limma_shared_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach limma (shared, normalisiert)")
+  geom_point() + ggtitle("Nach limma")
 
 ## harmony
 pca_after_harmony_shared_norm  <- prcomp(harmony_data_shared_norm)
 
 df_after_harmony_shared_norm <- data.frame(pca_after_harmony_shared_norm$x[,1:2], condition=batch)
 g2_harmony_shared_norm <- ggplot(df_after_harmony_shared_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach harmony (shared, normalisiert)")
+  geom_point() + ggtitle("Nach harmony")
 
 ## MMUPHin
 pca_after_MMUPHin_shared_norm  <- prcomp(t(MMUPHin_data_shared_norm$feature_abd_adj))
 
 df_after_MMUPHin_shared_norm <- data.frame(pca_after_MMUPHin_shared_norm$x[,1:2], condition=batch)
 g2_MMUPHin_shared_norm <- ggplot(df_after_MMUPHin_shared_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach MMUPHin (shared, normalisiert)")
+  geom_point() + ggtitle("Nach MMUPHin")
 
 
 
@@ -1649,6 +1656,55 @@ g1_shared_norm
   (g2_limma_shared_norm | g2_harmony_shared_norm)
 
 
+
+
+
+
+
+# Condition
+
+## ComBat
+pca_before_shared_norm <- prcomp(t(matrix_df_shared_norm))
+pca_after_combat_shared_norm  <- prcomp(t(combat_data_shared_norm))
+
+df_condition_before_shared_norm <- data.frame(pca_before_shared_norm$x[,1:2], condition=batch_condition)
+g1_condition_shared_norm <- ggplot(df_before_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach Normalisierung")
+
+d_conditionf_after_combat_shared_norm <- data.frame(pca_after_combat_shared_norm$x[,1:2], condition=batch_condition)
+g2_condition_combat_shared_norm <- ggplot(df_after_combat_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach ComBat")
+
+## limma
+pca_after_limma_shared_norm  <- prcomp(t(limma_data_shared_norm))
+
+df_condition_after_limma_shared_norm <- data.frame(pca_after_limma_shared_norm$x[,1:2], condition=batch_condition)
+g2_condition_limma_shared_norm <- ggplot(df_after_limma_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach limma")
+
+## harmony
+pca_after_harmony_shared_norm  <- prcomp(harmony_data_shared_norm)
+
+df_condition_after_harmony_shared_norm <- data.frame(pca_after_harmony_shared_norm$x[,1:2], condition=batch_condition)
+g2_condition_harmony_shared_norm <- ggplot(df_after_harmony_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach harmony")
+
+## MMUPHin
+pca_after_MMUPHin_shared_norm  <- prcomp(t(MMUPHin_data_shared_norm$feature_abd_adj))
+
+df_condition_after_MMUPHin_shared_norm <- data.frame(pca_after_MMUPHin_shared_norm$x[,1:2], condition=batch_condition)
+g2_condition_MMUPHin_shared_norm <- ggplot(df_after_MMUPHin_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach MMUPHin")
+
+
+
+
+
+(g1_shared + g1_condition_shared) /
+(g1_shared_norm + g1_condition_shared_norm)
+
+(g2_condition_MMUPHin_shared_norm | g2_condition_combat_shared_norm) /
+  (g2_condition_limma_shared_norm | g2_condition_harmony_shared_norm)
 
 
 
@@ -1725,6 +1781,60 @@ mean(sil_shared_after_MMUPHin[, "sil_width"])
 
 
 
+# Normalisierte Daten
+
+## before
+coords_shared_before_norm <- pca_before_shared_norm$x
+
+dist_matrix_shared_before_norm <- dist(coords_shared_before_norm)
+
+sil_shared_before_norm <- silhouette(as.numeric(batch_labels), dist_matrix_shared_before_norm)
+
+
+## after combat
+coords_shared_after_combat_norm <- pca_after_combat_shared_norm$x
+
+dist_matrix_shared_after_combat_norm <- dist(coords_shared_after_combat_norm)
+
+sil_shared_after_combat_norm <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_combat_norm)
+
+
+
+## after limma
+coords_shared_after_limma_norm <- pca_after_limma_shared_norm$x
+
+dist_matrix_shared_after_limma_norm <- dist(coords_shared_after_limma_norm)
+
+sil_shared_after_limma_norm <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_limma_norm)
+
+
+
+## after harmony
+coords_shared_after_harmony_norm <- pca_after_harmony_shared_norm$x
+
+dist_matrix_shared_after_harmony_norm <- dist(coords_shared_after_harmony_norm)
+
+sil_shared_after_harmony_norm <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_harmony_norm)
+
+
+
+## after MMUPHin
+coords_shared_after_MMUPHin_norm <- pca_after_MMUPHin_shared_norm$x
+
+dist_matrix_shared_after_MMUPHin_norm <- dist(coords_shared_after_MMUPHin_norm)
+
+sil_shared_after_MMUPHin_norm <- silhouette(as.numeric(batch_labels), dist_matrix_shared_after_MMUPHin_norm)
+
+
+## Vergleich average Silhouetten Score before und after
+mean(sil_shared_before_norm[, "sil_width"])
+mean(sil_shared_after_combat_norm[, "sil_width"])
+mean(sil_shared_after_limma_norm[, "sil_width"])
+mean(sil_shared_after_harmony_norm[, "sil_width"])
+mean(sil_shared_after_MMUPHin_norm[, "sil_width"])
+
+
+
 
 
 # kBET
@@ -1745,6 +1855,29 @@ k_bet_shared_harmony$summary
 
 k_bet_shared_MMUPHin <- kBET(MMUPHin_data_shared$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_MMUPHin$summary
+
+
+
+
+
+# Normalisierte Daten
+
+set.seed(2)
+
+k_bet_shared_norm <- kBET(as.matrix(matrix_df_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_norm$summary
+
+k_bet_shared_combat_norm <- kBET(combat_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_combat_norm$summary
+
+k_bet_shared_limma_norm <- kBET(limma_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_limma_norm$summary
+
+k_bet_shared_harmony_norm <- kBET(harmony_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_harmony_norm$summary
+
+k_bet_shared_MMUPHin_norm <- kBET(MMUPHin_data_shared_norm$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_MMUPHin_norm$summary
 
 
 
@@ -1791,6 +1924,48 @@ print(fit_adonis_shared_condition_after_MMUPHin)
 
 
 
+# Normalisierte Daten
+
+## Erklärte Varianz durch die Studien
+set.seed(2)
+fit_adonis_shared_before_norm <- adonis2(dist_matrix_shared_before_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_ComBat_norm <- adonis2(dist_matrix_shared_after_combat_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_limma_norm <- adonis2(dist_matrix_shared_after_limma_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_harmony_norm <- adonis2(dist_matrix_shared_after_harmony_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_after_MMUPHin_norm <- adonis2(dist_matrix_shared_after_MMUPHin_norm ~ study, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_shared_before_norm) 
+print(fit_adonis_shared_after_ComBat_norm)
+print(fit_adonis_shared_after_limma_norm)
+print(fit_adonis_shared_after_harmony_norm)
+print(fit_adonis_shared_after_MMUPHin_norm)
+
+
+
+## Erklärte Varianz durch die Krankheit
+set.seed(2)
+fit_adonis_shared_condition_before_norm <- adonis2(dist_matrix_shared_before_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_ComBat_norm <- adonis2(dist_matrix_shared_after_combat_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_limma_norm <- adonis2(dist_matrix_shared_after_limma_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_harmony_norm <- adonis2(dist_matrix_shared_after_harmony_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+fit_adonis_shared_condition_after_MMUPHin_norm <- adonis2(dist_matrix_shared_after_MMUPHin_norm ~ condition, data = Sup_File_Discovery, method = "euclidean")
+print(fit_adonis_shared_condition_before_norm)
+print(fit_adonis_shared_condition_after_ComBat_norm)
+print(fit_adonis_shared_condition_after_limma_norm)
+print(fit_adonis_shared_condition_after_harmony_norm)
+print(fit_adonis_shared_condition_after_MMUPHin_norm)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1816,6 +1991,8 @@ table(proteins_over20_shared)
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==2024]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==22]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==33284]
+
+tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==22),]), batch_condition, mean)
 
 
 
@@ -2083,6 +2260,8 @@ proteins_over20_shared_norm <- names(r2_shared_norm)[r2_shared_norm > 0.20]
 proteins_over20_shared_norm <- proteins_over20_shared_norm[!is.na(proteins_over20_shared_norm)] ## NAs entfernen
 table(proteins_over20_shared_norm)
 length(table(proteins_over20_shared_norm))
+
+tapply(as.numeric(matrix_df_shared_norm[which(rownames(matrix_df_shared_norm)==37164),]), batch_condition, mean)
 
 
 
