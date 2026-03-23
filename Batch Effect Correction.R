@@ -835,6 +835,37 @@ mean(sil_after_MMUPHin_norm[, "sil_width"])
 
 
 
+# Condition betrachten 
+batch_labels_condition <- as.factor(batch_condition)
+
+## before
+sil_condition_before_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_before_norm)
+
+## after Combat
+sil_condition_after_combat_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_after_combat_norm)
+
+## after limma
+sil_condition_after_limma_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_after_limma_norm)
+
+## after harmony
+sil_condition_after_harmony_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_after_harmony_norm)
+
+## after MMUPHin
+sil_condition_after_MMUPHin_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_after_MMUPHin_norm)
+
+mean(sil_condition_before[, "sil_width"])
+mean(sil_condition_before_norm[, "sil_width"])
+mean(sil_condition_after_combat_norm[, "sil_width"])
+mean(sil_condition_after_limma_norm[, "sil_width"])
+mean(sil_condition_after_harmony_norm[, "sil_width"])
+mean(sil_condition_after_harmony_norm[, "sil_width"])
+
+
+
+
+
+
+
 
 
 
@@ -1832,6 +1863,43 @@ mean(sil_shared_after_combat_norm[, "sil_width"])
 mean(sil_shared_after_limma_norm[, "sil_width"])
 mean(sil_shared_after_harmony_norm[, "sil_width"])
 mean(sil_shared_after_MMUPHin_norm[, "sil_width"])
+
+
+
+
+
+
+# Condition betrachten 
+batch_labels_condition <- as.factor(batch_condition)
+
+## before
+sil_shared_condition_before <- silhouette(as.numeric(batch_labels_condition), dist_matrix_shared_before)
+sil_shared_condition_before_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_shared_before_norm)
+
+## after Combat
+sil_shared_condition_after_combat_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_shared_after_combat_norm)
+
+## after limma
+sil_shared_condition_after_limma_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_shared_after_limma_norm)
+
+## after harmony
+sil_shared_condition_after_harmony_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_shared_after_harmony_norm)
+
+## after MMUPHin
+sil_shared_condition_after_MMUPHin_norm <- silhouette(as.numeric(batch_labels_condition), dist_matrix_shared_after_MMUPHin_norm)
+
+mean(sil_shared_condition_before[, "sil_width"])
+mean(sil_shared_condition_before_norm[, "sil_width"])
+mean(sil_shared_condition_after_combat_norm[, "sil_width"])
+mean(sil_shared_condition_after_limma_norm[, "sil_width"])
+mean(sil_shared_condition_after_harmony_norm[, "sil_width"])
+mean(sil_shared_condition_after_MMUPHin_norm[, "sil_width"])
+
+
+
+
+
+
 
 
 
