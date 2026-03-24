@@ -687,6 +687,8 @@ dist_matrix_before <- dist(coords_before)
 sil_before <- silhouette(as.numeric(batch_labels), dist_matrix_before)
 
 
+
+
 ## after combat
 coords_after_combat <- pca_after_combat$x
 
@@ -878,38 +880,40 @@ install_github('theislab/kBET')
 library(kBET)
 set.seed(2)
 
-k_bet <- kBET(as.matrix(matrix_df), batch = batch, plot = FALSE, n_repeat = 1000)
+## Dateiformat für kBET: Zeilen = Samples, Spalten = Metaproteine
+
+k_bet <- kBET(t(matrix_df), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet$summary
 
-k_bet_combat <- kBET(combat_data, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_combat <- kBET(t(combat_data), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_combat$summary
 
-k_bet_limma <- kBET(limma_data, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_limma <- kBET(t(limma_data), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_limma$summary
 
 k_bet_harmony <- kBET(harmony_data, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_harmony$summary
 
-k_bet_MMUPHin <- kBET(MMUPHin_data$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_MMUPHin <- kBET(t(MMUPHin_data$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_MMUPHin$summary
 
 
 
 
 # Normalisierte Daten
-k_bet_norm <- kBET(as.matrix(matrix_df_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_norm <- kBET(t(matrix_df_norm), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_norm$summary
 
-k_bet_combat_norm <- kBET(combat_data_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_combat_norm <- kBET(t(combat_data_norm), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_combat_norm$summary
 
-k_bet_limma_norm <- kBET(limma_data_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_limma_norm <- kBET(t(limma_data_norm), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_limma_norm$summary
 
 k_bet_harmony_norm <- kBET(harmony_data_norm, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_harmony_norm$summary
 
-k_bet_MMUPHin_norm <- kBET(MMUPHin_data_norm$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_MMUPHin_norm <- kBET(t(MMUPHin_data_norm$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_MMUPHin_norm$summary
 
 
@@ -1909,19 +1913,19 @@ mean(sil_shared_condition_after_MMUPHin_norm[, "sil_width"])
 library(kBET)
 set.seed(2)
 
-k_bet_shared <- kBET(as.matrix(matrix_df_shared), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared <- kBET(t(matrix_df_shared), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared$summary
 
-k_bet_shared_combat <- kBET(combat_data_shared, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_combat <- kBET(t(combat_data_shared), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_combat$summary
 
-k_bet_shared_limma <- kBET(limma_data_shared, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_limma <- kBET(t(limma_data_shared), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_limma$summary
 
 k_bet_shared_harmony <- kBET(harmony_data_shared, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_harmony$summary
 
-k_bet_shared_MMUPHin <- kBET(MMUPHin_data_shared$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_MMUPHin <- kBET(t(MMUPHin_data_shared$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_MMUPHin$summary
 
 
@@ -1932,19 +1936,19 @@ k_bet_shared_MMUPHin$summary
 
 set.seed(2)
 
-k_bet_shared_norm <- kBET(as.matrix(matrix_df_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_norm <- kBET(t(matrix_df_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_norm$summary
 
-k_bet_shared_combat_norm <- kBET(combat_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_combat_norm <- kBET(t(combat_data_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_combat_norm$summary
 
-k_bet_shared_limma_norm <- kBET(limma_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_limma_norm <- kBET(t(limma_data_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_limma_norm$summary
 
 k_bet_shared_harmony_norm <- kBET(harmony_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_harmony_norm$summary
 
-k_bet_shared_MMUPHin_norm <- kBET(MMUPHin_data_shared_norm$feature_abd_adj, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_MMUPHin_norm <- kBET(t(MMUPHin_data_shared_norm$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000)
 k_bet_shared_MMUPHin_norm$summary
 
 
@@ -2060,7 +2064,7 @@ Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==2024]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==22]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==33284]
 
-tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==22),]), batch_condition, mean)
+tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==2024),]), batch_condition, mean)
 
 
 
@@ -2345,7 +2349,7 @@ proteins_over20_ComBat_shared_norm <- proteins_over20_ComBat_shared_norm[!is.na(
 table(proteins_over20_ComBat_shared_norm)
 length(table(proteins_over20_ComBat_shared_norm))
 
-tapply(as.numeric(combat_data_shared_norm[which(rownames(combat_data_shared_norm)==37164),]), batch_condition, mean)
+tapply(as.numeric(combat_data_shared_norm[which(rownames(combat_data_shared_norm)==4293),]), batch_condition, mean)
 
 
 
@@ -2362,7 +2366,7 @@ proteins_over20_limma_shared_norm <- proteins_over20_limma_shared_norm[!is.na(pr
 table(proteins_over20_limma_shared_norm)
 length(table(proteins_over20_limma_shared_norm))
 
-tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)==37164),]), batch_condition, mean)
+tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)==4293),]), batch_condition, mean)
 
 
 
@@ -2379,7 +2383,7 @@ proteins_over20_harmony_shared_norm <- proteins_over20_harmony_shared_norm[!is.n
 table(proteins_over20_harmony_shared_norm)
 length(table(proteins_over20_harmony_shared_norm))
 
-tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shared_norm))==37164),]), batch_condition, mean)
+tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shared_norm))==20109),]), batch_condition, mean)
 
 
 
@@ -2396,7 +2400,7 @@ proteins_over20_MMUPHin_shared_norm <- proteins_over20_MMUPHin_shared_norm[!is.n
 table(proteins_over20_MMUPHin_shared_norm)
 length(table(proteins_over20_MMUPHin_shared_norm))
 
-tapply(as.numeric(MMUPHin_data_shared_norm$feature_abd_adj[which(rownames(MMUPHin_data_shared_norm$feature_abd_adj)==2347),]), batch_condition, mean)
+tapply(as.numeric(MMUPHin_data_shared_norm$feature_abd_adj[which(rownames(MMUPHin_data_shared_norm$feature_abd_adj)==20109),]), batch_condition, mean)
 
 
 
