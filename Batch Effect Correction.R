@@ -2064,7 +2064,37 @@ Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==2024]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==22]
 Raw_Data$Protein.Accessions[Raw_Data$Metaprotein.Number==33284]
 
-tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==2024),]), batch_condition, mean)
+tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==2),]), batch_condition, mean)
+
+
+
+
+
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_shared <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in shared_metaproteins){
+  fold_change_shared[m,] <- tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==m),]), batch_condition, mean)
+}
+fold_change_shared <- fold_change_shared[rownames(fold_change_shared) %in% shared_metaproteins,] ## nur die shared metaproteins behalten
+fold_change_shared$fc <- fold_change_shared$diseased/fold_change_shared$control ## fold change berechnen
+fold_change_shared$log2fc <- log2(fold_change_shared$fc) ## log2 fc
+fold_change_shared <- fold_change_shared[rownames(matrix_df_shared),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_shared$r2 <- r2_shared
+
+## volcano plot
+fold_change_shared$diffexpressed <- "NO"
+fold_change_shared$diffexpressed[fold_change_shared$log2fc > 1 & fold_change_shared$r2 > 0.2] <- "diseased"
+fold_change_shared$diffexpressed[fold_change_shared$log2fc < -1 & fold_change_shared$r2 > 0.2] <- "control"
+
+volcano_shared <- ggplot(data=fold_change_shared, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Vor Korrektur")
+volcano_shared
+
+
+
+
+
 
 
 
@@ -2337,6 +2367,35 @@ tapply(as.numeric(matrix_df_shared_norm[which(rownames(matrix_df_shared_norm)==3
 
 
 
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in shared_metaproteins){
+  fold_change_shared_norm[m,] <- tapply(as.numeric(matrix_df_shared_norm[which(rownames(matrix_df_shared_norm)==m),]), batch_condition, mean)
+}
+fold_change_shared_norm <- fold_change_shared_norm[rownames(fold_change_shared_norm) %in% shared_metaproteins,] ## nur die shared metaproteins behalten
+fold_change_shared_norm$fc <- fold_change_shared_norm$diseased/fold_change_shared_norm$control ## fold change berechnen
+fold_change_shared_norm$log2fc <- log2(fold_change_shared_norm$fc) ## log2 fc
+fold_change_shared_norm <- fold_change_shared_norm[rownames(matrix_df_shared_norm),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_shared_norm$r2 <- r2_shared_norm
+
+## volcano plot
+fold_change_shared_norm$diffexpressed <- "NO"
+fold_change_shared_norm$diffexpressed[fold_change_shared_norm$log2fc > 1 & fold_change_shared_norm$r2 > 0.2] <- "diseased"
+fold_change_shared_norm$diffexpressed[fold_change_shared_norm$log2fc < -1 & fold_change_shared_norm$r2 > 0.2] <- "control"
+
+volcano_shared_norm <- ggplot(data=fold_change_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Normalisierung")
+volcano_shared_norm
+
+
+
+
+
+
+
+
+
 
 # Erklärte Varianz der Krankheit nach Combat
 r2_ComBat_shared_norm <- apply(combat_data_shared_norm, 1, function(x) {
@@ -2354,6 +2413,37 @@ tapply(as.numeric(combat_data_shared_norm[which(rownames(combat_data_shared_norm
 
 
 
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_combat_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in shared_metaproteins){
+  fold_change_combat_shared_norm[m,] <- tapply(as.numeric(combat_data_shared_norm[which(rownames(combat_data_shared_norm)==m),]), batch_condition, mean)
+}
+fold_change_combat_shared_norm <- fold_change_combat_shared_norm[rownames(fold_change_combat_shared_norm) %in% shared_metaproteins,] ## nur die shared metaproteins behalten
+fold_change_combat_shared_norm$fc <- fold_change_combat_shared_norm$diseased/fold_change_combat_shared_norm$control ## fold change berechnen
+fold_change_combat_shared_norm$log2fc <- log2(fold_change_combat_shared_norm$fc) ## log2 fc
+fold_change_combat_shared_norm <- fold_change_combat_shared_norm[rownames(combat_data_shared_norm),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_combat_shared_norm$r2 <- r2_ComBat_shared_norm
+
+## volcano plot
+fold_change_combat_shared_norm$diffexpressed <- "NO"
+fold_change_combat_shared_norm$diffexpressed[fold_change_combat_shared_norm$log2fc > 1 & fold_change_combat_shared_norm$r2 > 0.2] <- "diseased"
+fold_change_combat_shared_norm$diffexpressed[fold_change_combat_shared_norm$log2fc < -1 & fold_change_combat_shared_norm$r2 > 0.2] <- "control"
+
+volcano_combat_shared_norm <- ggplot(data=fold_change_combat_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach ComBat")
+volcano_combat_shared_norm
+
+
+
+
+
+
+
+
+
+
+
 
 # Erklärte Varianz der Krankheit nach limma
 r2_limma_shared_norm <- apply(limma_data_shared_norm, 1, function(x) {
@@ -2366,7 +2456,38 @@ proteins_over20_limma_shared_norm <- proteins_over20_limma_shared_norm[!is.na(pr
 table(proteins_over20_limma_shared_norm)
 length(table(proteins_over20_limma_shared_norm))
 
-tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)==4293),]), batch_condition, mean)
+tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)==688),]), batch_condition, mean)
+
+
+
+
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_limma_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in shared_metaproteins){
+  fold_change_limma_shared_norm[m,] <- tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)==m),]), batch_condition, mean)
+}
+fold_change_limma_shared_norm <- fold_change_limma_shared_norm[rownames(fold_change_limma_shared_norm) %in% shared_metaproteins,] ## nur die shared metaproteins behalten
+fold_change_limma_shared_norm$fc <- fold_change_limma_shared_norm$diseased/fold_change_limma_shared_norm$control ## fold change berechnen
+fold_change_limma_shared_norm$log2fc <- log2(fold_change_limma_shared_norm$fc) ## log2 fc
+fold_change_limma_shared_norm <- fold_change_limma_shared_norm[rownames(limma_data_shared_norm),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_limma_shared_norm$r2 <- r2_limma_shared_norm
+
+## volcano plot
+fold_change_limma_shared_norm$diffexpressed <- "NO"
+fold_change_limma_shared_norm$diffexpressed[fold_change_limma_shared_norm$log2fc > 1 & fold_change_limma_shared_norm$r2 > 0.2] <- "diseased"
+fold_change_limma_shared_norm$diffexpressed[fold_change_limma_shared_norm$log2fc < -1 & fold_change_limma_shared_norm$r2 > 0.2] <- "control"
+
+volcano_limma_shared_norm <- ggplot(data=fold_change_limma_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach limma")
+volcano_limma_shared_norm
+
+
+
+
+
+
+
 
 
 
@@ -2383,7 +2504,38 @@ proteins_over20_harmony_shared_norm <- proteins_over20_harmony_shared_norm[!is.n
 table(proteins_over20_harmony_shared_norm)
 length(table(proteins_over20_harmony_shared_norm))
 
-tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shared_norm))==20109),]), batch_condition, mean)
+tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shared_norm))==6157),]), batch_condition, mean)
+
+
+
+
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_harmony_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in shared_metaproteins){
+  fold_change_harmony_shared_norm[m,] <- tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shared_norm))==m),]), batch_condition, mean)
+}
+fold_change_harmony_shared_norm <- fold_change_harmony_shared_norm[rownames(fold_change_harmony_shared_norm) %in% shared_metaproteins,] ## nur die shared metaproteins behalten
+fold_change_harmony_shared_norm$fc <- fold_change_harmony_shared_norm$diseased/fold_change_harmony_shared_norm$control ## fold change berechnen
+fold_change_harmony_shared_norm$log2fc <- log2(fold_change_harmony_shared_norm$fc) ## log2 fc
+fold_change_harmony_shared_norm <- fold_change_harmony_shared_norm[rownames(t(harmony_data_shared_norm)),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_harmony_shared_norm$r2 <- r2_harmony_shared_norm
+
+## volcano plot
+fold_change_harmony_shared_norm$diffexpressed <- "NO"
+fold_change_harmony_shared_norm$diffexpressed[fold_change_harmony_shared_norm$log2fc > 1 & fold_change_harmony_shared_norm$r2 > 0.2] <- "diseased"
+fold_change_harmony_shared_norm$diffexpressed[fold_change_harmony_shared_norm$log2fc < -1 & fold_change_harmony_shared_norm$r2 > 0.2] <- "control"
+
+volcano_harmony_shared_norm <- ggplot(data=fold_change_harmony_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Harmony")
+volcano_harmony_shared_norm
+
+
+
+
+
+
+
 
 
 
@@ -2403,5 +2555,34 @@ length(table(proteins_over20_MMUPHin_shared_norm))
 tapply(as.numeric(MMUPHin_data_shared_norm$feature_abd_adj[which(rownames(MMUPHin_data_shared_norm$feature_abd_adj)==20109),]), batch_condition, mean)
 
 
+
+
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_MMUPHin_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in shared_metaproteins){
+  fold_change_MMUPHin_shared_norm[m,] <- tapply(as.numeric(MMUPHin_data_shared_norm$feature_abd_adj[which(rownames(MMUPHin_data_shared_norm$feature_abd_adj)==m),]), batch_condition, mean)
+}
+fold_change_MMUPHin_shared_norm <- fold_change_MMUPHin_shared_norm[rownames(fold_change_MMUPHin_shared_norm) %in% shared_metaproteins,] ## nur die shared metaproteins behalten
+fold_change_MMUPHin_shared_norm$fc <- fold_change_MMUPHin_shared_norm$diseased/fold_change_MMUPHin_shared_norm$control ## fold change berechnen
+fold_change_MMUPHin_shared_norm$log2fc <- log2(fold_change_MMUPHin_shared_norm$fc) ## log2 fc
+fold_change_MMUPHin_shared_norm <- fold_change_MMUPHin_shared_norm[rownames(MMUPHin_data_shared_norm$feature_abd_adj),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_MMUPHin_shared_norm$r2 <- r2_MMUPHin_shared_norm
+
+## volcano plot
+fold_change_MMUPHin_shared_norm$diffexpressed <- "NO"
+fold_change_MMUPHin_shared_norm$diffexpressed[fold_change_MMUPHin_shared_norm$log2fc > 1 & fold_change_MMUPHin_shared_norm$r2 > 0.2] <- "diseased"
+fold_change_MMUPHin_shared_norm$diffexpressed[fold_change_MMUPHin_shared_norm$log2fc < -1 & fold_change_MMUPHin_shared_norm$r2 > 0.2] <- "control"
+
+volcano_MMUPHin_shared_norm <- ggplot(data=fold_change_MMUPHin_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach MMUPHin")
+volcano_MMUPHin_shared_norm
+
+
+
+volcano_shared + volcano_shared_norm
+
+(volcano_combat_shared_norm + volcano_MMUPHin_shared_norm)/
+  (volcano_limma_shared_norm + volcano_harmony_shared_norm)
 
 
