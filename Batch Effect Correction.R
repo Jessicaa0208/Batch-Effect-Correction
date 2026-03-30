@@ -882,7 +882,7 @@ set.seed(2)
 
 ## Dateiformat für kBET: Zeilen = Samples, Spalten = Metaproteine
 
-k_bet <- kBET(t(matrix_df), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet <- kBET(t(matrix_df), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet$summary
 
 k_bet_combat <- kBET(t(combat_data), batch = batch, plot = FALSE, n_repeat = 1000)
@@ -901,19 +901,19 @@ k_bet_MMUPHin$summary
 
 
 # Normalisierte Daten
-k_bet_norm <- kBET(t(matrix_df_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_norm <- kBET(t(matrix_df_norm), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_norm$summary
 
-k_bet_combat_norm <- kBET(t(combat_data_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_combat_norm <- kBET(t(combat_data_norm), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_combat_norm$summary
 
-k_bet_limma_norm <- kBET(t(limma_data_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_limma_norm <- kBET(t(limma_data_norm), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_limma_norm$summary
 
-k_bet_harmony_norm <- kBET(harmony_data_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_harmony_norm <- kBET(harmony_data_norm, batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_harmony_norm$summary
 
-k_bet_MMUPHin_norm <- kBET(t(MMUPHin_data_norm$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_MMUPHin_norm <- kBET(t(MMUPHin_data_norm$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_MMUPHin_norm$summary
 
 
@@ -1913,7 +1913,7 @@ mean(sil_shared_condition_after_MMUPHin_norm[, "sil_width"])
 library(kBET)
 set.seed(2)
 
-k_bet_shared <- kBET(t(matrix_df_shared), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared <- kBET(t(matrix_df_shared), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_shared$summary
 
 k_bet_shared_combat <- kBET(t(combat_data_shared), batch = batch, plot = FALSE, n_repeat = 1000)
@@ -1936,19 +1936,19 @@ k_bet_shared_MMUPHin$summary
 
 set.seed(2)
 
-k_bet_shared_norm <- kBET(t(matrix_df_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_norm <- kBET(t(matrix_df_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_shared_norm$summary
 
-k_bet_shared_combat_norm <- kBET(t(combat_data_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_combat_norm <- kBET(t(combat_data_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_shared_combat_norm$summary
 
-k_bet_shared_limma_norm <- kBET(t(limma_data_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_limma_norm <- kBET(t(limma_data_shared_norm), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_shared_limma_norm$summary
 
-k_bet_shared_harmony_norm <- kBET(harmony_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_harmony_norm <- kBET(harmony_data_shared_norm, batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_shared_harmony_norm$summary
 
-k_bet_shared_MMUPHin_norm <- kBET(t(MMUPHin_data_shared_norm$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000)
+k_bet_shared_MMUPHin_norm <- kBET(t(MMUPHin_data_shared_norm$feature_abd_adj), batch = batch, plot = FALSE, n_repeat = 1000, k0 = 18)
 k_bet_shared_MMUPHin_norm$summary
 
 
@@ -2088,7 +2088,9 @@ fold_change_shared$diffexpressed[fold_change_shared$log2fc < -1 & fold_change_sh
 
 volcano_shared <- ggplot(data=fold_change_shared, aes(x=log2fc, y=r2, col=diffexpressed)) + 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
-  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Vor Korrektur")
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Vor Korrektur") +
+  scale_color_manual(values=c("indianred1", "turquoise3")) +
+  labs(color = "Biomarker")
 volcano_shared
 
 
@@ -2385,7 +2387,9 @@ fold_change_shared_norm$diffexpressed[fold_change_shared_norm$log2fc < -1 & fold
 
 volcano_shared_norm <- ggplot(data=fold_change_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
-  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Normalisierung")
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Normalisierung") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker")
 volcano_shared_norm
 
 
@@ -2431,7 +2435,9 @@ fold_change_combat_shared_norm$diffexpressed[fold_change_combat_shared_norm$log2
 
 volcano_combat_shared_norm <- ggplot(data=fold_change_combat_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
-  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach ComBat")
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach ComBat") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker")
 volcano_combat_shared_norm
 
 
@@ -2479,7 +2485,9 @@ fold_change_limma_shared_norm$diffexpressed[fold_change_limma_shared_norm$log2fc
 
 volcano_limma_shared_norm <- ggplot(data=fold_change_limma_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
-  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach limma")
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach limma") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker")
 volcano_limma_shared_norm
 
 
@@ -2527,7 +2535,9 @@ fold_change_harmony_shared_norm$diffexpressed[fold_change_harmony_shared_norm$lo
 
 volcano_harmony_shared_norm <- ggplot(data=fold_change_harmony_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
-  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Harmony")
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Harmony") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker")
 volcano_harmony_shared_norm
 
 
@@ -2575,7 +2585,9 @@ fold_change_MMUPHin_shared_norm$diffexpressed[fold_change_MMUPHin_shared_norm$lo
 
 volcano_MMUPHin_shared_norm <- ggplot(data=fold_change_MMUPHin_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
-  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach MMUPHin")
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach MMUPHin") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker")
 volcano_MMUPHin_shared_norm
 
 
