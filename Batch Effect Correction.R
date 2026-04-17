@@ -342,7 +342,7 @@ g1_combat_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
 
 df_after_combat_norm <- data.frame(pca_after_combat_norm$x[,1:2], batch=batch)
 g2_combat_norm <- ggplot(df_after_combat_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach ComBat (normalisiert)")
+  geom_point() + ggtitle("Nach ComBat")
 
 g1_combat_norm + g2_combat_norm
 
@@ -371,6 +371,15 @@ g2_condition_combat <- ggplot(df_condition_after_combat, aes(PC1, PC2, color=bat
   geom_point() + ggtitle("Nach ComBat")
 
 g1_condition_combat + g2_condition_combat
+
+
+## Normalierte condition
+pca_before_norm <- prcomp(t(matrix_df_norm))
+pca_after_combat_norm  <- prcomp(t(combat_data_norm))
+
+df_condition_after_combat_norm <- data.frame(pca_after_combat_norm$x[,1:2], batch=batch_condition)
+g2_condition_combat_norm <- ggplot(df_condition_after_combat_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach ComBat")
 
 
 
@@ -446,7 +455,7 @@ g1_limma_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
 
 df_after_limma_norm <- data.frame(pca_after_limma_norm$x[,1:2], batch=batch)
 g2_limma_norm <- ggplot(df_after_limma_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach limma (normalisiert)")
+  geom_point() + ggtitle("Nach Limma")
 
 g1_limma_norm + g2_limma_norm
 
@@ -467,14 +476,17 @@ g1_condition_limma <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_cond
 
 df_condition_after_limma <- data.frame(pca_after_limma$x[,1:2], condition=batch_condition)
 g2_condition_limma <- ggplot(df_condition_after_limma, aes(PC1, PC2, color=batch_condition)) +
-  geom_point() + ggtitle("Nach limma")
+  geom_point() + ggtitle("Nach Limma")
 
 g1_condition_limma + g2_condition_limma
 
 
 
 
-
+## Normalisierte condition
+df_condition_after_limma_norm <- data.frame(pca_after_limma_norm$x[,1:2], batch=batch_condition)
+g2_condition_limma_norm <- ggplot(df_condition_after_limma_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach Limma")
 
 
 
@@ -539,7 +551,7 @@ g1_harmony_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
 
 df_after_harmony_norm <- data.frame(pca_after_harmony_norm$x[,1:2], batch=batch)
 g2_harmony_norm <- ggplot(df_after_harmony_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach harmony (normalisiert)")
+  geom_point() + ggtitle("Nach Harmony")
 
 g1_harmony_norm + g2_harmony_norm
 
@@ -559,6 +571,12 @@ g1_condition_harmony <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_co
 df_condition_after_harmony <- data.frame(pca_after_harmony$x[,1:2], condition=batch_condition)
 g2_condition_harmony <- ggplot(df_condition_after_harmony, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Nach harmony")
+
+
+## Normalisierte condition
+df_condition_after_harmony_norm <- data.frame(pca_after_harmony_norm$x[,1:2], batch=batch_condition)
+g2_condition_harmony_norm <- ggplot(df_condition_after_harmony_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach Harmony")
 
 
 
@@ -647,18 +665,52 @@ g1_MMUPHin_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
 
 df_after_MMUPHin_norm <- data.frame(pca_after_MMUPHin_norm$x[,1:2], batch=batch)
 g2_MMUPHin_norm <- ggplot(df_after_MMUPHin_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach MMUPHin (normalisiert)")
+  geom_point() + ggtitle("Nach MMUPHin")
 
 g1_MMUPHin_norm + g2_MMUPHin_norm
 
 
+## Grafik für Bericht
+g1 <- ggplot(df_before, aes(PC1, PC2, color=batch)) +
+  geom_point() + ggtitle("Vor Korrektur")
 g1_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Vor Korrektur (normalisiert)")
+  geom_point() + ggtitle("Nach Normalisierung")
 
 
+
+ (g1 | g1_norm)/
 (g2_MMUPHin_norm | g2_combat_norm) /
   (g2_limma_norm | g2_harmony_norm)
-g1_norm
+
+
+
+
+
+## Normalisierte condition
+df_condition_after_MMUPHin_norm <- data.frame(pca_after_MMUPHin_norm$x[,1:2], batch=batch_condition)
+g2_condition_MMUPHin_norm <- ggplot(df_condition_after_MMUPHin_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach MMUPHin")
+
+
+
+
+
+## Grafik für Bericht
+df_condition_before <- data.frame(pca_before$x[,1:2], condition=batch_condition)
+g1_condition <- ggplot(df_condition_before, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Vor Korrektur")
+df_condition_before_norm <- data.frame(pca_before_norm$x[,1:2], condition=batch_condition)
+g1_condition_norm <- ggplot(df_condition_before_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach Normalisierung")
+
+(g1_condition | g1_condition_norm)/
+  (g2_condition_MMUPHin_norm | g2_condition_combat_norm) /
+  (g2_condition_limma_norm | g2_condition_harmony_norm)
+
+
+
+
+
 
 
 
@@ -1034,6 +1086,36 @@ tapply(as.numeric(matrix_df[which(rownames(matrix_df)==33284),]), batch_conditio
 
 
 
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in Metaprotein.Number){
+  fold_change[m,] <- tapply(as.numeric(matrix_df[which(rownames(matrix_df)==m),]), batch_condition, mean)
+}
+fold_change <- fold_change[rownames(fold_change) %in% Metaprotein.Number,] ## nur die shared metaproteins behalten
+fold_change$fc <- fold_change$diseased/fold_change$control ## fold change berechnen
+fold_change$log2fc <- log2(fold_change$fc) ## log2 fc
+fold_change <- fold_change[rownames(matrix_df),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change$r2 <- r2
+
+## volcano plot
+fold_change$diffexpressed <- "NO"
+fold_change$diffexpressed[fold_change$log2fc > 1 & fold_change$r2 > 0.2] <- "diseased"
+fold_change$diffexpressed[fold_change$log2fc < -1 & fold_change$r2 > 0.2] <- "control"
+
+volcano <- ggplot(data=fold_change, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Vor Korrektur") +
+  scale_color_manual(values=c("indianred1", "turquoise3")) +
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
+volcano
+
+
+
+
+
 
 
 
@@ -1332,6 +1414,39 @@ table(proteins_over20_norm)
 length(table(proteins_over20_norm))
 
 
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in Metaprotein.Number){
+  fold_change_norm[m,] <- tapply(as.numeric(matrix_df_norm[which(rownames(matrix_df_norm)==m),]), batch_condition, mean)
+}
+fold_change_norm <- fold_change_norm[rownames(fold_change_norm) %in% Metaprotein.Number,] ## nur die shared metaproteins behalten
+fold_change_norm$fc <- fold_change_norm$diseased/fold_change_norm$control ## fold change berechnen
+fold_change_norm$log2fc <- log2(fold_change_norm$fc) ## log2 fc
+fold_change_norm <- fold_change_norm[rownames(matrix_df_norm),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_norm$r2 <- r2_norm
+
+## volcano plot
+fold_change_norm$diffexpressed <- "NO"
+fold_change_norm$diffexpressed[fold_change_norm$log2fc > 1 & fold_change_norm$r2 > 0.2] <- "diseased"
+fold_change_norm$diffexpressed[fold_change_norm$log2fc < -1 & fold_change_norm$r2 > 0.2] <- "control"
+
+volcano_norm <- ggplot(data=fold_change_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Normalisierung") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
+volcano_norm
+
+
+
+
+
+
+
+
 
 
 # Erklärte Varianz der Krankheit nach Combat
@@ -1346,6 +1461,39 @@ table(proteins_over20_ComBat_norm)
 length(table(proteins_over20_ComBat_norm))
 
 tapply(as.numeric(combat_data_norm[which(rownames(combat_data_norm)==37164),]), batch_condition, mean)
+
+
+
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_combat_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in Metaprotein.Number){
+  fold_change_combat_norm[m,] <- tapply(as.numeric(combat_data_norm[which(rownames(combat_data_norm)==m),]), batch_condition, mean)
+}
+fold_change_combat_norm <- fold_change_combat_norm[rownames(fold_change_combat_norm) %in% Metaprotein.Number,] ## nur die shared metaproteins behalten
+fold_change_combat_norm$fc <- fold_change_combat_norm$diseased/fold_change_combat_norm$control ## fold change berechnen
+fold_change_combat_norm$log2fc <- log2(fold_change_combat_norm$fc) ## log2 fc
+fold_change_combat_norm <- fold_change_combat_norm[rownames(combat_data_norm),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_combat_norm$r2 <- r2_ComBat_norm
+
+## volcano plot
+fold_change_combat_norm$diffexpressed <- "NO"
+fold_change_combat_norm$diffexpressed[fold_change_combat_norm$log2fc > 1 & fold_change_combat_norm$r2 > 0.2] <- "diseased"
+fold_change_combat_norm$diffexpressed[fold_change_combat_norm$log2fc < -1 & fold_change_combat_norm$r2 > 0.2] <- "control"
+
+volcano_combat_norm <- ggplot(data=fold_change_combat_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach ComBat") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
+volcano_combat_norm
+
+
+
+
+
 
 
 
@@ -1367,6 +1515,39 @@ tapply(as.numeric(limma_data_norm[which(rownames(limma_data_norm)==37164),]), ba
 
 
 
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_limma_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in Metaprotein.Number){
+  fold_change_limma_norm[m,] <- tapply(as.numeric(limma_data_norm[which(rownames(limma_data_norm)==m),]), batch_condition, mean)
+}
+fold_change_limma_norm <- fold_change_limma_norm[rownames(fold_change_limma_norm) %in% Metaprotein.Number,] ## nur die shared metaproteins behalten
+fold_change_limma_norm$fc <- fold_change_limma_norm$diseased/fold_change_limma_norm$control ## fold change berechnen
+fold_change_limma_norm$log2fc <- log2(fold_change_limma_norm$fc) ## log2 fc
+fold_change_limma_norm <- fold_change_limma_norm[rownames(limma_data_norm),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_limma_norm$r2 <- r2_limma_norm
+
+## volcano plot
+fold_change_limma_norm$diffexpressed <- "NO"
+fold_change_limma_norm$diffexpressed[fold_change_limma_norm$log2fc > 1 & fold_change_limma_norm$r2 > 0.2] <- "diseased"
+fold_change_limma_norm$diffexpressed[fold_change_limma_norm$log2fc < -1 & fold_change_limma_norm$r2 > 0.2] <- "control"
+
+volcano_limma_norm <- ggplot(data=fold_change_limma_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Limma") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
+volcano_limma_norm
+
+
+
+
+
+
+
+
 
 
 # Erklärte Varianz der Krankheit nach harmony
@@ -1381,6 +1562,38 @@ table(proteins_over20_harmony_norm)
 length(table(proteins_over20_harmony_norm))
 
 tapply(as.numeric(t(harmony_data_norm)[which(rownames(t(harmony_data_norm))==1673),]), batch_condition, mean)
+
+
+
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_harmony_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in Metaprotein.Number){
+  fold_change_harmony_norm[m,] <- tapply(as.numeric(t(harmony_data_norm)[which(rownames(t(harmony_data_norm))==m),]), batch_condition, mean)
+}
+fold_change_harmony_norm <- fold_change_harmony_norm[rownames(fold_change_harmony_norm) %in% Metaprotein.Number,] ## nur die shared metaproteins behalten
+fold_change_harmony_norm$fc <- fold_change_harmony_norm$diseased/fold_change_harmony_norm$control ## fold change berechnen
+fold_change_harmony_norm$log2fc <- log2(fold_change_harmony_norm$fc) ## log2 fc
+fold_change_harmony_norm <- fold_change_harmony_norm[rownames(t(harmony_data_norm)),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_harmony_norm$r2 <- r2_harmony_norm
+
+## volcano plot
+fold_change_harmony_norm$diffexpressed <- "NO"
+fold_change_harmony_norm$diffexpressed[fold_change_harmony_norm$log2fc > 1 & fold_change_harmony_norm$r2 > 0.2] <- "diseased"
+fold_change_harmony_norm$diffexpressed[fold_change_harmony_norm$log2fc < -1 & fold_change_harmony_norm$r2 > 0.2] <- "control"
+
+volcano_harmony_norm <- ggplot(data=fold_change_harmony_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Harmony") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
+volcano_harmony_norm
+
+
+
+
 
 
 
@@ -1402,14 +1615,45 @@ tapply(as.numeric(MMUPHin_data_norm$feature_abd_adj[which(rownames(MMUPHin_data_
 
 
 
+## Fold Change und R^2 in einem dataframe abspeichern
+fold_change_MMUPHin_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+for(m in Metaprotein.Number){
+  fold_change_MMUPHin_norm[m,] <- tapply(as.numeric(MMUPHin_data_norm$feature_abd_adj[which(rownames(MMUPHin_data_norm$feature_abd_adj)==m),]), batch_condition, mean)
+}
+fold_change_MMUPHin_norm <- fold_change_MMUPHin_norm[rownames(fold_change_MMUPHin_norm) %in% Metaprotein.Number,] ## nur die shared metaproteins behalten
+fold_change_MMUPHin_norm$fc <- fold_change_MMUPHin_norm$diseased/fold_change_MMUPHin_norm$control ## fold change berechnen
+fold_change_MMUPHin_norm$log2fc <- log2(fold_change_MMUPHin_norm$fc) ## log2 fc
+fold_change_MMUPHin_norm <- fold_change_MMUPHin_norm[rownames(MMUPHin_data_norm$feature_abd_adj),] ## Metaproteine in die gleiche Reihenfolge bringen wie matrix_df, da damit r2 berechnet wurde
+fold_change_MMUPHin_norm$r2 <- r2_MMUPHin_norm
+
+## volcano plot
+fold_change_MMUPHin_norm$diffexpressed <- "NO"
+fold_change_MMUPHin_norm$diffexpressed[fold_change_MMUPHin_norm$log2fc > 1 & fold_change_MMUPHin_norm$r2 > 0.2] <- "diseased"
+fold_change_MMUPHin_norm$diffexpressed[fold_change_MMUPHin_norm$log2fc < -1 & fold_change_MMUPHin_norm$r2 > 0.2] <- "control"
+
+volcano_MMUPHin_norm <- ggplot(data=fold_change_MMUPHin_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
+  geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach MMUPHin") +
+  scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
+volcano_MMUPHin_norm
+
+
+
+(volcano + volcano_norm)/
+  (volcano_combat_norm + volcano_MMUPHin_norm)/
+  (volcano_limma_norm + volcano_harmony_norm)
 
 
 
 
+save(fold_change, fold_change_norm, fold_change_combat_norm, fold_change_limma_norm,
+     fold_change_harmony_norm, fold_change_MMUPHin_norm, file = "fold_change")
 
-
-
-
+load("fold_change")
 
 
 
@@ -1668,14 +1912,14 @@ pca_after_limma_shared_norm  <- prcomp(t(limma_data_shared_norm))
 
 df_after_limma_shared_norm <- data.frame(pca_after_limma_shared_norm$x[,1:2], condition=batch)
 g2_limma_shared_norm <- ggplot(df_after_limma_shared_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach limma")
+  geom_point() + ggtitle("Nach Limma")
 
 ## harmony
 pca_after_harmony_shared_norm  <- prcomp(harmony_data_shared_norm)
 
 df_after_harmony_shared_norm <- data.frame(pca_after_harmony_shared_norm$x[,1:2], condition=batch)
 g2_harmony_shared_norm <- ggplot(df_after_harmony_shared_norm, aes(PC1, PC2, color=batch)) +
-  geom_point() + ggtitle("Nach harmony")
+  geom_point() + ggtitle("Nach Harmony")
 
 ## MMUPHin
 pca_after_MMUPHin_shared_norm  <- prcomp(t(MMUPHin_data_shared_norm$feature_abd_adj))
@@ -1686,7 +1930,8 @@ g2_MMUPHin_shared_norm <- ggplot(df_after_MMUPHin_shared_norm, aes(PC1, PC2, col
 
 
 
-g1_shared_norm
+## Grafik für Bericht
+ (g1_shared | g1_shared_norm)/
 (g2_MMUPHin_shared_norm | g2_combat_shared_norm) /
   (g2_limma_shared_norm | g2_harmony_shared_norm)
 
@@ -1703,32 +1948,32 @@ pca_before_shared_norm <- prcomp(t(matrix_df_shared_norm))
 pca_after_combat_shared_norm  <- prcomp(t(combat_data_shared_norm))
 
 df_condition_before_shared_norm <- data.frame(pca_before_shared_norm$x[,1:2], condition=batch_condition)
-g1_condition_shared_norm <- ggplot(df_before_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+g1_condition_shared_norm <- ggplot(df_condition_before_shared_norm, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Nach Normalisierung")
 
-d_conditionf_after_combat_shared_norm <- data.frame(pca_after_combat_shared_norm$x[,1:2], condition=batch_condition)
-g2_condition_combat_shared_norm <- ggplot(df_after_combat_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+df_condition_after_combat_shared_norm <- data.frame(pca_after_combat_shared_norm$x[,1:2], condition=batch_condition)
+g2_condition_combat_shared_norm <- ggplot(df_condition_after_combat_shared_norm, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Nach ComBat")
 
 ## limma
 pca_after_limma_shared_norm  <- prcomp(t(limma_data_shared_norm))
 
 df_condition_after_limma_shared_norm <- data.frame(pca_after_limma_shared_norm$x[,1:2], condition=batch_condition)
-g2_condition_limma_shared_norm <- ggplot(df_after_limma_shared_norm, aes(PC1, PC2, color=batch_condition)) +
-  geom_point() + ggtitle("Nach limma")
+g2_condition_limma_shared_norm <- ggplot(df_condition_after_limma_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach Limma")
 
 ## harmony
 pca_after_harmony_shared_norm  <- prcomp(harmony_data_shared_norm)
 
 df_condition_after_harmony_shared_norm <- data.frame(pca_after_harmony_shared_norm$x[,1:2], condition=batch_condition)
-g2_condition_harmony_shared_norm <- ggplot(df_after_harmony_shared_norm, aes(PC1, PC2, color=batch_condition)) +
-  geom_point() + ggtitle("Nach harmony")
+g2_condition_harmony_shared_norm <- ggplot(df_condition_after_harmony_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+  geom_point() + ggtitle("Nach Harmony")
 
 ## MMUPHin
 pca_after_MMUPHin_shared_norm  <- prcomp(t(MMUPHin_data_shared_norm$feature_abd_adj))
 
 df_condition_after_MMUPHin_shared_norm <- data.frame(pca_after_MMUPHin_shared_norm$x[,1:2], condition=batch_condition)
-g2_condition_MMUPHin_shared_norm <- ggplot(df_after_MMUPHin_shared_norm, aes(PC1, PC2, color=batch_condition)) +
+g2_condition_MMUPHin_shared_norm <- ggplot(df_condition_after_MMUPHin_shared_norm, aes(PC1, PC2, color=batch_condition)) +
   geom_point() + ggtitle("Nach MMUPHin")
 
 
@@ -1738,6 +1983,9 @@ g2_condition_MMUPHin_shared_norm <- ggplot(df_after_MMUPHin_shared_norm, aes(PC1
 (g1_shared + g1_condition_shared) /
 (g1_shared_norm + g1_condition_shared_norm)
 
+
+## Grafik für Bericht
+(g1_condition_shared | g1_condition_shared_norm)/
 (g2_condition_MMUPHin_shared_norm | g2_condition_combat_shared_norm) /
   (g2_condition_limma_shared_norm | g2_condition_harmony_shared_norm)
 
@@ -2071,7 +2319,7 @@ tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==2),]), batc
 
 
 ## Fold Change und R^2 in einem dataframe abspeichern
-fold_change_shared <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+fold_change_shared <- data.frame(control = rep(0, 1620), diseased = rep(0, 1620))
 for(m in shared_metaproteins){
   fold_change_shared[m,] <- tapply(as.numeric(matrix_df_shared[which(rownames(matrix_df_shared)==m),]), batch_condition, mean)
 }
@@ -2090,7 +2338,10 @@ volcano_shared <- ggplot(data=fold_change_shared, aes(x=log2fc, y=r2, col=diffex
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Vor Korrektur") +
   scale_color_manual(values=c("indianred1", "turquoise3")) +
-  labs(color = "Biomarker")
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
 volcano_shared
 
 
@@ -2370,7 +2621,7 @@ tapply(as.numeric(matrix_df_shared_norm[which(rownames(matrix_df_shared_norm)==3
 
 
 ## Fold Change und R^2 in einem dataframe abspeichern
-fold_change_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+fold_change_shared_norm <- data.frame(control = rep(0, 1620), diseased = rep(0, 1620))
 for(m in shared_metaproteins){
   fold_change_shared_norm[m,] <- tapply(as.numeric(matrix_df_shared_norm[which(rownames(matrix_df_shared_norm)==m),]), batch_condition, mean)
 }
@@ -2389,7 +2640,10 @@ volcano_shared_norm <- ggplot(data=fold_change_shared_norm, aes(x=log2fc, y=r2, 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Normalisierung") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker")
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
 volcano_shared_norm
 
 
@@ -2418,7 +2672,7 @@ tapply(as.numeric(combat_data_shared_norm[which(rownames(combat_data_shared_norm
 
 
 ## Fold Change und R^2 in einem dataframe abspeichern
-fold_change_combat_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+fold_change_combat_shared_norm <- data.frame(control = rep(0, 1620), diseased = rep(0, 1620))
 for(m in shared_metaproteins){
   fold_change_combat_shared_norm[m,] <- tapply(as.numeric(combat_data_shared_norm[which(rownames(combat_data_shared_norm)==m),]), batch_condition, mean)
 }
@@ -2437,7 +2691,10 @@ volcano_combat_shared_norm <- ggplot(data=fold_change_combat_shared_norm, aes(x=
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach ComBat") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker")
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
 volcano_combat_shared_norm
 
 
@@ -2468,7 +2725,7 @@ tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)=
 
 
 ## Fold Change und R^2 in einem dataframe abspeichern
-fold_change_limma_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+fold_change_limma_shared_norm <- data.frame(control = rep(0, 1620), diseased = rep(0, 1620))
 for(m in shared_metaproteins){
   fold_change_limma_shared_norm[m,] <- tapply(as.numeric(limma_data_shared_norm[which(rownames(limma_data_shared_norm)==m),]), batch_condition, mean)
 }
@@ -2485,9 +2742,12 @@ fold_change_limma_shared_norm$diffexpressed[fold_change_limma_shared_norm$log2fc
 
 volcano_limma_shared_norm <- ggplot(data=fold_change_limma_shared_norm, aes(x=log2fc, y=r2, col=diffexpressed)) + 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
-  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach limma") +
+  geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Limma") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker")
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
 volcano_limma_shared_norm
 
 
@@ -2518,7 +2778,7 @@ tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shar
 
 
 ## Fold Change und R^2 in einem dataframe abspeichern
-fold_change_harmony_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+fold_change_harmony_shared_norm <- data.frame(control = rep(0, 1620), diseased = rep(0, 1620))
 for(m in shared_metaproteins){
   fold_change_harmony_shared_norm[m,] <- tapply(as.numeric(t(harmony_data_shared_norm)[which(rownames(t(harmony_data_shared_norm))==m),]), batch_condition, mean)
 }
@@ -2537,7 +2797,10 @@ volcano_harmony_shared_norm <- ggplot(data=fold_change_harmony_shared_norm, aes(
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Harmony") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker")
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
 volcano_harmony_shared_norm
 
 
@@ -2568,7 +2831,7 @@ tapply(as.numeric(MMUPHin_data_shared_norm$feature_abd_adj[which(rownames(MMUPHi
 
 
 ## Fold Change und R^2 in einem dataframe abspeichern
-fold_change_MMUPHin_shared_norm <- data.frame(control = rep(0, 45432), diseased = rep(0, 45432))
+fold_change_MMUPHin_shared_norm <- data.frame(control = rep(0, 1620), diseased = rep(0, 1620))
 for(m in shared_metaproteins){
   fold_change_MMUPHin_shared_norm[m,] <- tapply(as.numeric(MMUPHin_data_shared_norm$feature_abd_adj[which(rownames(MMUPHin_data_shared_norm$feature_abd_adj)==m),]), batch_condition, mean)
 }
@@ -2587,14 +2850,21 @@ volcano_MMUPHin_shared_norm <- ggplot(data=fold_change_MMUPHin_shared_norm, aes(
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach MMUPHin") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker")
+  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
+        legend.title = element_text(size = 12), legend.text = element_text(size = 12),
+        plot.title = element_text(size = 13))
 volcano_MMUPHin_shared_norm
 
 
 
-volcano_shared + volcano_shared_norm
-
-(volcano_combat_shared_norm + volcano_MMUPHin_shared_norm)/
+(volcano_shared + volcano_shared_norm)/
+(volcano_MMUPHin_shared_norm + volcano_combat_shared_norm)/
   (volcano_limma_shared_norm + volcano_harmony_shared_norm)
 
 
+
+save(fold_change_shared, fold_change_shared_norm, fold_change_combat_shared_norm,
+     fold_change_limma_shared_norm, fold_change_harmony_shared_norm,
+     fold_change_MMUPHin_shared_norm, file = "fold_change_shared")
+load("fold_change_shared")
