@@ -335,6 +335,8 @@ g1_combat + g2_combat
 # Normalisierte Daten
 pca_before_norm <- prcomp(t(matrix_df_norm))
 pca_after_combat_norm  <- prcomp(t(combat_data_norm))
+pca_after_combat_norm$x[,1] <- -pca_after_combat_norm$x[,1] ## x-Achse spiegeln
+pca_after_combat_norm$x[,2] <- -pca_after_combat_norm$x[,2] ## y-Achse spiegeln
 
 df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
 g1_combat_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
@@ -448,6 +450,8 @@ limma_data_norm <- removeBatchEffect(as.matrix(matrix_df_norm), batch = batch)
 
 pca_before_norm <- prcomp(t(matrix_df_norm))
 pca_after_limma_norm  <- prcomp(t(limma_data_norm))
+pca_after_limma_norm$x[,1] <- -pca_after_limma_norm$x[,1] ## x-Achse spiegeln
+pca_after_limma_norm$x[,2] <- -pca_after_limma_norm$x[,2] ## y-Achse spiegeln
 
 df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
 g1_limma_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
@@ -544,6 +548,7 @@ harmony_data_norm <- RunHarmony(data_mat = as.matrix(t(matrix_df_norm)), meta_da
 
 pca_before_norm <- prcomp(t(matrix_df_norm))
 pca_after_harmony_norm  <- prcomp(harmony_data_norm)
+pca_after_harmony_norm$x[,1] <- -pca_after_harmony_norm$x[,1] ## x-Achse spiegeln
 
 df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
 g1_harmony_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
@@ -658,6 +663,7 @@ MMUPHin_data_norm <- adjust_batch(feature_abd = matrix_df_norm, batch = "study",
 
 pca_before_norm <- prcomp(t(matrix_df_norm))
 pca_after_MMUPHin_norm  <- prcomp(t(MMUPHin_data_norm$feature_abd_adj))
+pca_after_MMUPHin_norm$x[,1] <- -pca_after_MMUPHin_norm$x[,1] ## x-Achse spiegeln
 
 df_before_norm <- data.frame(pca_before_norm$x[,1:2], batch=batch)
 g1_MMUPHin_norm <- ggplot(df_before_norm, aes(PC1, PC2, color=batch)) +
@@ -1106,14 +1112,15 @@ volcano <- ggplot(data=fold_change, aes(x=log2fc, y=r2, col=diffexpressed)) +
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Vor Korrektur") +
   scale_color_manual(values=c("indianred1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano
 
-
-
+table(fold_change$diffexpressed)
+rownames(fold_change)[which(fold_change$diffexpressed=="diseased")]
+rownames(fold_change)[which(fold_change$diffexpressed=="control")]
 
 
 
@@ -1434,14 +1441,15 @@ volcano_norm <- ggplot(data=fold_change_norm, aes(x=log2fc, y=r2, col=diffexpres
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Normalisierung") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_norm
 
-
-
+table(fold_change_norm$diffexpressed)
+rownames(fold_change_norm)[which(fold_change_norm$diffexpressed=="diseased")]
+rownames(fold_change_norm)[which(fold_change_norm$diffexpressed=="control")]
 
 
 
@@ -1484,14 +1492,15 @@ volcano_combat_norm <- ggplot(data=fold_change_combat_norm, aes(x=log2fc, y=r2, 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach ComBat") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_combat_norm
 
-
-
+table(fold_change_combat_norm$diffexpressed)
+rownames(fold_change_combat_norm)[which(fold_change_combat_norm$diffexpressed=="diseased")]
+rownames(fold_change_combat_norm)[which(fold_change_combat_norm$diffexpressed=="control")]
 
 
 
@@ -1535,14 +1544,15 @@ volcano_limma_norm <- ggplot(data=fold_change_limma_norm, aes(x=log2fc, y=r2, co
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Limma") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_limma_norm
 
-
-
+table(fold_change_limma_norm$diffexpressed)
+rownames(fold_change_limma_norm)[which(fold_change_limma_norm$diffexpressed=="diseased")]
+rownames(fold_change_limma_norm)[which(fold_change_limma_norm$diffexpressed=="control")]
 
 
 
@@ -1585,14 +1595,15 @@ volcano_harmony_norm <- ggplot(data=fold_change_harmony_norm, aes(x=log2fc, y=r2
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Harmony") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_harmony_norm
 
-
-
+table(fold_change_harmony_norm$diffexpressed)
+rownames(fold_change_harmony_norm)[which(fold_change_harmony_norm$diffexpressed=="diseased")]
+rownames(fold_change_harmony_norm)[which(fold_change_harmony_norm$diffexpressed=="control")]
 
 
 
@@ -1635,12 +1646,15 @@ volcano_MMUPHin_norm <- ggplot(data=fold_change_MMUPHin_norm, aes(x=log2fc, y=r2
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach MMUPHin") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_MMUPHin_norm
 
+table(fold_change_MMUPHin_norm$diffexpressed)
+rownames(fold_change_MMUPHin_norm)[which(fold_change_MMUPHin_norm$diffexpressed=="diseased")]
+rownames(fold_change_MMUPHin_norm)[which(fold_change_MMUPHin_norm$diffexpressed=="control")]
 
 
 (volcano + volcano_norm)/
@@ -1898,6 +1912,7 @@ MMUPHin_data_shared_norm <- adjust_batch(feature_abd = matrix_df_shared_norm, ba
 ## ComBat
 pca_before_shared_norm <- prcomp(t(matrix_df_shared_norm))
 pca_after_combat_shared_norm  <- prcomp(t(combat_data_shared_norm))
+pca_after_combat_shared_norm$x[,1] <- -pca_after_combat_shared_norm$x[,1] ## x-Achse spiegeln
 
 df_before_shared_norm <- data.frame(pca_before_shared_norm$x[,1:2], condition=batch)
 g1_shared_norm <- ggplot(df_before_shared_norm, aes(PC1, PC2, color=batch)) +
@@ -1916,6 +1931,8 @@ g2_limma_shared_norm <- ggplot(df_after_limma_shared_norm, aes(PC1, PC2, color=b
 
 ## harmony
 pca_after_harmony_shared_norm  <- prcomp(harmony_data_shared_norm)
+pca_after_harmony_shared_norm$x[,1] <- -pca_after_harmony_shared_norm$x[,1] ## x-Achse spiegeln
+pca_after_harmony_shared_norm$x[,2] <- -pca_after_harmony_shared_norm$x[,2] ## y-Achse spiegeln
 
 df_after_harmony_shared_norm <- data.frame(pca_after_harmony_shared_norm$x[,1:2], condition=batch)
 g2_harmony_shared_norm <- ggplot(df_after_harmony_shared_norm, aes(PC1, PC2, color=batch)) +
@@ -1923,6 +1940,7 @@ g2_harmony_shared_norm <- ggplot(df_after_harmony_shared_norm, aes(PC1, PC2, col
 
 ## MMUPHin
 pca_after_MMUPHin_shared_norm  <- prcomp(t(MMUPHin_data_shared_norm$feature_abd_adj))
+pca_after_MMUPHin_shared_norm$x[,1] <- -pca_after_MMUPHin_shared_norm$x[,1] ## x-Achse spiegeln
 
 df_after_MMUPHin_shared_norm <- data.frame(pca_after_MMUPHin_shared_norm$x[,1:2], condition=batch)
 g2_MMUPHin_shared_norm <- ggplot(df_after_MMUPHin_shared_norm, aes(PC1, PC2, color=batch)) +
@@ -2338,14 +2356,15 @@ volcano_shared <- ggplot(data=fold_change_shared, aes(x=log2fc, y=r2, col=diffex
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Vor Korrektur") +
   scale_color_manual(values=c("indianred1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_shared
 
-
-
+table(fold_change_shared$diffexpressed)
+rownames(fold_change_shared)[which(fold_change_shared$diffexpressed=="diseased")]
+rownames(fold_change_shared)[which(fold_change_shared$diffexpressed=="control")]
 
 
 
@@ -2640,12 +2659,16 @@ volcano_shared_norm <- ggplot(data=fold_change_shared_norm, aes(x=log2fc, y=r2, 
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Normalisierung") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_shared_norm
 
+
+table(fold_change_shared_norm$diffexpressed)
+rownames(fold_change_shared_norm)[which(fold_change_shared_norm$diffexpressed=="diseased")]
+rownames(fold_change_shared_norm)[which(fold_change_shared_norm$diffexpressed=="control")]
 
 
 
@@ -2691,14 +2714,15 @@ volcano_combat_shared_norm <- ggplot(data=fold_change_combat_shared_norm, aes(x=
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach ComBat") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_combat_shared_norm
 
-
-
+table(fold_change_combat_shared_norm$diffexpressed)
+rownames(fold_change_combat_shared_norm)[which(fold_change_combat_shared_norm$diffexpressed=="diseased")]
+rownames(fold_change_combat_shared_norm)[which(fold_change_combat_shared_norm$diffexpressed=="control")]
 
 
 
@@ -2744,14 +2768,15 @@ volcano_limma_shared_norm <- ggplot(data=fold_change_limma_shared_norm, aes(x=lo
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Limma") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_limma_shared_norm
 
-
-
+table(fold_change_limma_shared_norm$diffexpressed)
+rownames(fold_change_limma_shared_norm)[which(fold_change_limma_shared_norm$diffexpressed=="diseased")]
+rownames(fold_change_limma_shared_norm)[which(fold_change_limma_shared_norm$diffexpressed=="control")]
 
 
 
@@ -2797,14 +2822,15 @@ volcano_harmony_shared_norm <- ggplot(data=fold_change_harmony_shared_norm, aes(
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach Harmony") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_harmony_shared_norm
 
-
-
+table(fold_change_harmony_shared_norm$diffexpressed)
+rownames(fold_change_harmony_shared_norm)[which(fold_change_harmony_shared_norm$diffexpressed=="diseased")]
+rownames(fold_change_harmony_shared_norm)[which(fold_change_harmony_shared_norm$diffexpressed=="control")]
 
 
 
@@ -2850,12 +2876,15 @@ volcano_MMUPHin_shared_norm <- ggplot(data=fold_change_MMUPHin_shared_norm, aes(
   geom_point() + theme_minimal() + geom_vline(xintercept=c(-1, 1), linetype = "dashed") +
   geom_hline(yintercept = 0.2, linetype = "dashed") + ggtitle("Nach MMUPHin") +
   scale_color_manual(values=c("indianred1", "darkgoldenrod1", "turquoise3")) +
-  labs(color = "Biomarker", x = "log2 fold change", y = expression(R^2)) +
+  labs(color = "Biomarker", x = expression(log[2]~fold~change), y = expression(R^2)) +
   theme(axis.title = element_text(size = 12), axis.text = element_text(size = 12),
         legend.title = element_text(size = 12), legend.text = element_text(size = 12),
         plot.title = element_text(size = 13))
 volcano_MMUPHin_shared_norm
 
+table(fold_change_MMUPHin_shared_norm$diffexpressed)
+rownames(fold_change_MMUPHin_shared_norm)[which(fold_change_MMUPHin_shared_norm$diffexpressed=="diseased")]
+rownames(fold_change_MMUPHin_shared_norm)[which(fold_change_MMUPHin_shared_norm$diffexpressed=="control")]
 
 
 (volcano_shared + volcano_shared_norm)/
